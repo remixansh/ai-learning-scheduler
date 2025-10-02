@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Learning Scheduler</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #007aff;
+      --primary-gradient: linear-gradient(135deg, #007aff, #00c6ff);
+      --background-color: #f4f6f9;
+      --card-background: rgba(255, 255, 255, 0.9);
+      --text-color: #1c1c1e;
+      --subtle-text-color: #6d6d72;
+      --border-color: #e5e5ea;
+      --shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: var(--background-color);
+      color: var(--text-color);
+      transition: background 0.3s ease;
+    }
+    body.no-scroll { overflow: hidden; }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      font-weight: 700;
+      margin-bottom: 2rem;
+      color: var(--text-color);
+      font-size: 2rem;
+    }
+    h1 span { color: var(--primary-color); }
+
+    .action-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .action-buttons button {
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      background: var(--card-background);
+      color: var(--primary-color);
+      border: 1px solid var(--primary-color);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      transition: all 0.3s ease;
+      width: auto;
+    }
+    .action-buttons button:hover {
+      background: var(--primary-gradient);
+      color: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(0, 122, 255, 0.25);
+    }
+
+    .input-form {
+      background: var(--card-background);
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      margin: 0 auto 2rem;
+      max-width: 800px;
+      backdrop-filter: blur(10px);
+    }
+    .input-group {
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+    .input-group label {
+      font-weight: 500;
+      color: var(--subtle-text-color);
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    input {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      font-size: 16px;
+      background: #fff;
+      transition: all 0.3s ease;
+    }
+    input:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 8px rgba(0, 122, 255, 0.3);
+      outline: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background: var(--primary-gradient);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      box-shadow: var(--shadow);
+      transition: all 0.3s ease;
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 122, 255, 0.25);
+    }
+
+    #schedule-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+    }
+    .day-card {
+      background: var(--card-background);
+      border-radius: 16px;
+      padding: 1.5rem;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      animation: fadeInUp 0.5s ease forwards;
+    }
+    .day-card:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+    }
+    .day-card h2 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+    .day-card h3 {
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.5rem;
+    }
+    .day-card ul {
+      padding-left: 20px;
+      list-style-type: '✓ ';
+      color: var(--subtle-text-color);
+    }
+    .day-card ul li { margin-bottom: 0.5rem; }
+    .day-card strong {
+      display: block;
+      margin-top: 1rem;
+      font-weight: 600;
+    }
+    .day-card p {
+      margin-top: 0.25rem;
+      color: var(--subtle-text-color);
+    }
+
+    #loading {
+      display: none;
+      text-align: center;
+      font-size: 18px;
+      color: var(--subtle-text-color);
+      padding: 40px;
+    }
+
+    /* Lightbox */
+    #lightbox-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    #lightbox-content {
+      background: rgb(255 255 255);
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      max-width: 600px;
+      width: 100%;
+      position: relative;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      font-size: 2.5rem;
+      color: #aaa;
+      cursor: pointer;
+      line-height: 1;
+      transition: color 0.2s;
+    }
+    .close-btn:hover { color: var(--text-color); }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧠 AI Learning <span>Scheduler</span></h1>
+
+    <div class="action-buttons">
+      <button id="import-btn">Import</button>
+      <input type="file" id="file-input" accept=".xml" style="display:none;">
+      <button id="export-btn">Download</button>
+    </div>
+
+    <form id="schedule-form" class="input-form">
+      <div class="input-group">
+        <label for="topic">What do you want to learn?</label>
+        <input type="text" id="topic" name="topic" placeholder="e.g., Python" required>
+      </div>
+      <div class="input-group">
+        <label for="duration">How much time to finish?</label>
+        <input type="text" id="duration" name="duration" placeholder="e.g., 7 days" required>
+      </div>
+      <div class="input-group">
+        <label for="commitment">How many hours per day?</label>
+        <input type="text" id="commitment" name="commitment" placeholder="e.g., 2 hours" required>
+      </div>
+      <button type="submit">Generate Schedule</button>
+    </form>
+
+    <div id="loading">Generating your plan... Please wait.</div>
+    <div id="schedule-container"></div>
+  </div>
+
+  <!-- Lightbox -->
+  <div id="lightbox-overlay">
+    <div id="lightbox-content">
+      <span class="close-btn">&times;</span>
+      <div id="lightbox-body"></div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('schedule-form');
+    const container = document.getElementById('schedule-container');
+    const loadingIndicator = document.getElementById('loading');
+    const lightboxOverlay = document.getElementById('lightbox-overlay');
+    const lightboxBody = document.getElementById('lightbox-body');
+    const closeBtn = document.querySelector('.close-btn');
+    const importBtn = document.getElementById('import-btn');
+    const exportBtn = document.getElementById('export-btn');
+    const fileInput = document.getElementById('file-input');
+    let scheduleDataCache = null;
+
+    // Form submission
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      loadingIndicator.style.display = 'block';
+      container.innerHTML = '';
+
+      const formData = {
+        topic: document.getElementById('topic').value,
+        total_duration: document.getElementById('duration').value,
+        daily_commitment: document.getElementById('commitment').value
+      };
+
+      try {
+        const response = await fetch('/generate-schedule', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+        if (!response.ok) throw new Error('Network response was not ok');
+        scheduleDataCache = await response.json();
+        displaySchedule(scheduleDataCache);
+      } catch (error) {
+        container.innerHTML = `<p style="color: red; text-align: center;">Error: Could not generate schedule. Please ensure the backend server is running.</p>`;
+        console.error('Fetch error:', error);
+      } finally {
+        loadingIndicator.style.display = 'none';
+      }
+    });
+
+    // Display cards
+    function displaySchedule(scheduleData) {
+      if (!scheduleData || scheduleData.length === 0) {
+        container.innerHTML = '';
+        return;
+      }
+      let scheduleHTML = '';
+      scheduleData.forEach((day, index) => {
+        const exerciseSummary = day.exercise.length > 100 ? day.exercise.substring(0, 100) + '...' : day.exercise;
+        scheduleHTML += `
+          <div class="day-card" onclick="openLightbox(${index})">
+            <h2>Day ${day.day}: ${day.topic_of_the_day}</h2>
+            <h3>Tasks:</h3>
+            <ul>${day.tasks.slice(0, 2).map(task => `<li>${task}</li>`).join('')} ${day.tasks.length > 2 ? '<li>...</li>' : ''}</ul>
+            <strong>Exercise:</strong>
+            <p>${exerciseSummary}</p>
+          </div>
+        `;
+      });
+      container.innerHTML = scheduleHTML;
+    }
+
+    // Lightbox
+    function openLightbox(index) {
+      document.body.classList.add('no-scroll');
+      const day = scheduleDataCache[index];
+      let lightboxHTML = `
+        <h2>Day ${day.day}: ${day.topic_of_the_day}</h2>
+        <h3>Tasks:</h3>
+        <ul>${day.tasks.map(task => `<li>${task}</li>`).join('')}</ul>
+        <strong>Exercise:</strong>
+        <p>${day.exercise}</p>
+      `;
+      lightboxBody.innerHTML = lightboxHTML;
+      lightboxOverlay.style.display = 'flex';
+    }
+    function closeLightbox() {
+      document.body.classList.remove('no-scroll');
+      lightboxOverlay.style.display = 'none';
+    }
+
+    // Export
+    function exportToXML() {
+      if (!scheduleDataCache) {
+        alert('Please generate a schedule first.');
+        return;
+      }
+      const escapeXML = (str) => str.replace(/[<>&'"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','\'':'&apos;','"':'&quot;'}[c]));
+      let xmlString = '<?xml version="1.0" encoding="UTF-8"?>\n<schedule>\n';
+      scheduleDataCache.forEach(day => {
+        xmlString += `  <day id="${day.day}">\n`;
+        xmlString += `    <topic>${escapeXML(day.topic_of_the_day)}</topic>\n`;
+        xmlString += `    <tasks>\n`;
+        day.tasks.forEach(task => { xmlString += `      <task>${escapeXML(task)}</task>\n`; });
+        xmlString += `    </tasks>\n`;
+        xmlString += `    <exercise>${escapeXML(day.exercise)}</exercise>\n`;
+        xmlString += `  </day>\n`;
+      });
+      xmlString += '</schedule>';
+      const blob = new Blob([xmlString], { type: 'application/xml' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'schedule.xml';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // Import
+    function handleFileImport(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const parser = new DOMParser();
+          const xmlDoc = parser.parseFromString(e.target.result, "application/xml");
+          if (xmlDoc.getElementsByTagName("parsererror").length) {
+            throw new Error("Failed to parse XML.");
+          }
+          const importedData = [];
+          const dayNodes = xmlDoc.getElementsByTagName("day");
+          for (const dayNode of dayNodes) {
+            const dayData = {
+              day: dayNode.getAttribute("id"),
+              topic_of_the_day: dayNode.querySelector("topic").textContent,
+              tasks: Array.from(dayNode.querySelectorAll("tasks task")).map(task => task.textContent),
+              exercise: dayNode.querySelector("exercise").textContent
+            };
+            importedData.push(dayData);
+          }
+          scheduleDataCache = importedData;
+          displaySchedule(scheduleDataCache);
+        } catch (error) {
+          alert('Error importing file. Please ensure it is a valid schedule XML file.');
+          console.error("XML Import Error:", error);
+        }
+      };
+      reader.readAsText(file);
+      fileInput.value = '';
+    }
+
+    // Event listeners
+    closeBtn.addEventListener('click', closeLightbox);
+    lightboxOverlay.addEventListener('click', (event) => { if (event.target === lightboxOverlay) closeLightbox(); });
+    document.addEventListener('keydown', (event) => { if (event.key === 'Escape') closeLightbox(); });
+    importBtn.addEventListener('click', () => fileInput.click());
+    exportBtn.addEventListener('click', exportToXML);
+    fileInput.addEventListener('change', handleFileImport);
+  </script>
+</body>
+</html>
