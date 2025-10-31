@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI Learning Scheduler</title>
-  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -251,7 +250,6 @@
     <div id="schedule-container"></div>
   </div>
 
-  <!-- Lightbox -->
   <div id="lightbox-overlay">
     <div id="lightbox-content">
       <span class="close-btn">&times;</span>
@@ -271,11 +269,12 @@
     const fileInput = document.getElementById('file-input');
     let scheduleDataCache = null;
 
-    // Form submission
+    // --- REWRITTEN for streaming JSON Lines ---
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
       loadingIndicator.style.display = 'block';
-      container.innerHTML = '';
+      container.innerHTML = ''; // Clear the container
+      scheduleDataCache = []; // Reset the cache
 
       const formData = {
         topic: document.getElementById('topic').value,
@@ -290,17 +289,69 @@
           body: JSON.stringify(formData)
         });
         if (!response.ok) throw new Error('Network response was not ok');
-        scheduleDataCache = await response.json();
-        displaySchedule(scheduleDataCache);
+
+        // --- Logic to read the stream line by line ---
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          
+          // Process all complete lines (JSON objects) in the buffer
+          while (buffer.includes('\n')) {
+            const newlineIndex = buffer.indexOf('\n');
+            const line = buffer.substring(0, newlineIndex).trim();
+            buffer = buffer.substring(newlineIndex + 1);
+
+            if (line) {
+              try {
+                const dayData = JSON.parse(line);
+                if (dayData.error) {
+                  throw new Error(dayData.error);
+                }
+                
+                // Add this day to the cache
+                scheduleDataCache.push(dayData);
+                // Append the new card to the UI immediately
+                appendDayCard(dayData, scheduleDataCache.length - 1);
+                
+              } catch (e) {
+                console.error('Failed to parse JSON line:', line, e);
+              }
+            }
+          }
+        }
+        // --- End of streaming logic ---
+
       } catch (error) {
-        container.innerHTML = `<p style="color: red; text-align: center;">Error: Could not generate schedule. Please ensure the backend server is running.</p>`;
+        container.innerHTML = `<p style="color: red; text-align: center;">Error: Could not generate schedule. ${error.message}</p>`;
         console.error('Fetch error:', error);
       } finally {
         loadingIndicator.style.display = 'none';
       }
     });
 
-    // Display cards
+    // --- NEW Function: Appends a single card to the container ---
+    function appendDayCard(day, index) {
+      const exerciseSummary = day.exercise.length > 100 ? day.exercise.substring(0, 100) + '...' : day.exercise;
+      const cardHTML = `
+        <div class="day-card" onclick="openLightbox(${index})">
+          <h2>Day ${day.day}: ${day.topic_of_the_day}</h2>
+          <h3>Tasks:</h3>
+          <ul>${day.tasks.slice(0, 2).map(task => `<li>${task}</li>`).join('')} ${day.tasks.length > 2 ? '<li>...</li>' : ''}</ul>
+          <strong>Exercise:</strong>
+          <p>${exerciseSummary}</p>
+        </div>
+      `;
+      // insertAdjacentHTML is more efficient than innerHTML +=
+      container.insertAdjacentHTML('beforeend', cardHTML);
+    }
+
+    // --- UNCHANGED: Used for displaying imported XML data ---
     function displaySchedule(scheduleData) {
       if (!scheduleData || scheduleData.length === 0) {
         container.innerHTML = '';
@@ -322,7 +373,7 @@
       container.innerHTML = scheduleHTML;
     }
 
-    // Lightbox
+    // --- UNCHANGED: Lightbox ---
     function openLightbox(index) {
       document.body.classList.add('no-scroll');
       const day = scheduleDataCache[index];
@@ -341,13 +392,13 @@
       lightboxOverlay.style.display = 'none';
     }
 
-    // Export
+    // --- UNCHANGED: Export ---
     function exportToXML() {
-      if (!scheduleDataCache) {
+      if (!scheduleDataCache || scheduleDataCache.length === 0) {
         alert('Please generate a schedule first.');
         return;
       }
-      const escapeXML = (str) => str.replace(/[<>&'"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','\'':'&apos;','"':'&quot;'}[c]));
+      const escapeXML = (str) => String(str).replace(/[<>&'"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','\'':'&apos;','"':'&quot;'}[c]));
       let xmlString = '<?xml version="1.0" encoding="UTF-8"?>\n<schedule>\n';
       scheduleDataCache.forEach(day => {
         xmlString += `  <day id="${day.day}">\n`;
@@ -370,7 +421,7 @@
       URL.revokeObjectURL(url);
     }
 
-    // Import
+    // --- UNCHANGED: Import ---
     function handleFileImport(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -394,7 +445,7 @@
             importedData.push(dayData);
           }
           scheduleDataCache = importedData;
-          displaySchedule(scheduleDataCache);
+          displaySchedule(scheduleDataCache); // Uses the original display function
         } catch (error) {
           alert('Error importing file. Please ensure it is a valid schedule XML file.');
           console.error("XML Import Error:", error);
@@ -404,7 +455,7 @@
       fileInput.value = '';
     }
 
-    // Event listeners
+    // --- UNCHANGED: Event listeners ---
     closeBtn.addEventListener('click', closeLightbox);
     lightboxOverlay.addEventListener('click', (event) => { if (event.target === lightboxOverlay) closeLightbox(); });
     document.addEventListener('keydown', (event) => { if (event.key === 'Escape') closeLightbox(); });

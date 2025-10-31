@@ -2,7 +2,7 @@ import os
 import json
 import google.generativeai as genai
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv
@@ -18,8 +18,7 @@ try:
     genai.configure(api_key=api_key)
 except Exception as e:
     print(f"Error configuring Gemini API: {e}")
-    # You might want to exit or handle this more gracefully
-    # For now, we'll let it raise an error if the API is called.
+    # We'll let it raise an error if the API is called.
 
 # --- FastAPI App Initialization ---
 app = FastAPI(
@@ -28,18 +27,9 @@ app = FastAPI(
 )
 
 # --- CORS (Cross-Origin Resource Sharing) Middleware ---
-# This allows your frontend (running on a different origin) to communicate with this backend.
-origins = [
-    "http://localhost",
-    "http://localhost:8000",
-    "http://127.0.0.1",
-    "http://127.0.0.1:8000",
-    # Add other origins if needed, e.g., your local network IP for mobile testing
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # For simplicity, allowing all origins. For production, restrict this to your domain.
+    allow_origins=["*"], # For simplicity
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -62,60 +52,68 @@ async def serve_homepage():
         with open("index.html", "r", encoding="utf-8") as f:
             return f.read()
     except FileNotFoundError:
-        raise HTTPException(status_code=404, detail="index.html not found. Make sure the file is in the same directory.")
+        raise HTTPException(status_code=404, detail="index.html not found.")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"An error occurred while reading the HTML file: {e}")
+        raise HTTPException(status_code=500, detail=f"An error occurred: {e}")
 
 
-def create_prompt(request: ScheduleRequest) -> str:
+def create_streaming_prompt(request: ScheduleRequest) -> str:
     """
-    Creates a detailed, structured prompt for the Gemini API to generate a learning schedule.
+    Creates a prompt that asks for JSON Lines (one JSON object per line).
     """
     return f"""
-You are an expert learning planner. Your task is to create a detailed, day-by-day study schedule based on the user's request.
+You are an expert learning planner. Your task is to generate a study schedule.
 
-The user wants to learn: "{request.topic}"
-They want to complete it in: "{request.total_duration}"
-They will study for: "{request.daily_commitment}" per day.
+User request:
+Topic: "{request.topic}"
+Total Duration: "{request.total_duration}"
+Daily Commitment: "{request.daily_commitment}"
 
-Break down the main topic into logical, sequential sub-topics. For each day, provide 3-5 specific, actionable to-do list items and one practical, hands-on exercise.
+Your output MUST be a series of valid JSON objects, one for each day, SEPARATED BY A NEWLINE.
+DO NOT wrap the output in a JSON array (no [ ] brackets at the start or end).
+DO NOT include any text, explanations, or markdown formatting before or after the JSON objects.
 
-Your output MUST be a valid JSON array of objects. Do not include any text, explanations, or markdown formatting (like ```json) before or after the JSON array.
-
-The JSON structure for each object in the array must be:
-{{
-  "day": <integer>,
-  "topic_of_the_day": "<string>",
-  "tasks": ["<string>", "<string>", ...],
-  "exercise": "<string>"
-}}
+The JSON structure for EACH LINE must be:
+{{"day": <integer>, "topic_of_the_day": "<string>", "tasks": ["<string>", ...], "exercise": "<string>"}}
 """
 
-@app.post("/generate-schedule")
-async def generate_schedule(request: ScheduleRequest):
+async def stream_json_objects(request: ScheduleRequest):
     """
-    Receives user learning goals and generates a structured JSON schedule using the Gemini API.
+    Calls Gemini with stream=True and yields one complete JSON object string (line) at a time.
     """
     try:
         model = genai.GenerativeModel('gemini-2.5-flash')
-        prompt = create_prompt(request)
+        prompt = create_streaming_prompt(request)
         
-        response = model.generate_content(prompt)
+        response = model.generate_content(prompt, stream=True)
         
-        # Clean up potential markdown formatting from the response text
-        cleaned_text = response.text.strip().replace("```json", "").replace("```", "").strip()
+        buffer = ""
+        for chunk in response:
+            if chunk.text:
+                buffer += chunk.text
+                
+                # Check if we have one or more complete lines (JSON objects)
+                while '\n' in buffer:
+                    line, buffer = buffer.split('\n', 1)
+                    if line.strip():
+                        yield line + '\n' # Send the complete JSON line
         
-        # Parse the cleaned string into a Python list/dictionary
-        schedule_data = json.loads(cleaned_text)
-        
-        return schedule_data
-        
-    except json.JSONDecodeError:
-        print("Error: Failed to decode JSON from the Gemini API response.")
-        print("Raw response:", response.text)
-        raise HTTPException(status_code=500, detail="The AI response was not in a valid JSON format. Please try again.")
+        # Send any remaining data in the buffer
+        if buffer.strip():
+            yield buffer + '\n'
+            
     except Exception as e:
-        print(f"An unexpected error occurred: {e}")
-        # This will catch other potential errors, such as from the API call itself.
-        raise HTTPException(status_code=500, detail=f"An internal error occurred: {str(e)}")
+        print(f"Error during streaming: {e}")
+        # Send a JSON error object as the last line
+        yield json.dumps({"error": str(e)}) + '\n'
 
+# REPLACED Endpoint: Now streams JSON Lines
+@app.post("/generate-schedule")
+async def generate_schedule_stream(request: ScheduleRequest):
+    """
+    Receives user learning goals and STREAMS a schedule as JSON Lines.
+    """
+    return StreamingResponse(
+        stream_json_objects(request), 
+        media_type="application/x-ndjson" # ndjson = newline-delimited json
+    )
