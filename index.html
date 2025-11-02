@@ -27,7 +27,6 @@
       color: var(--text-color);
       transition: background 0.3s ease;
     }
-    /* Utility class to prevent background scroll when lightbox is open */
     body.no-scroll { overflow: hidden; }
 
     .container {
@@ -123,6 +122,34 @@
       transform: translateY(-2px);
       box-shadow: 0 8px 20px rgba(0, 122, 255, 0.25);
     }
+    
+    .duration-input-container {
+      display: flex;
+      gap: 10px;
+    }
+    .duration-input-container input[type="number"] {
+      width: 100%;
+      flex: 1;
+    }
+    .duration-input-container select {
+      width: 120px;
+      flex-shrink: 0;
+      padding: 14px;
+      border: 5px solid var(--border-color);
+      border-radius: 12px;
+      font-size: 16px;
+      background: #fff;
+      transition: all 0.3s ease;
+      font-family: 'Inter', sans-serif; /* Inherit font */
+      color: var(--text-color); /* Inherit color */
+    }
+    .duration-input-container select:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 8px rgba(0, 122, 255, 0.3);
+      outline: none;
+    }
+    
+
 
     #schedule-container {
       display: grid;
@@ -216,8 +243,238 @@
       line-height: 1;
       transition: color 0.2s;
     }
-    .close-btn:hover { color: var(--text-color); }
 
+    /* --- MODIFIED LOADING STYLE --- */
+    #loading {
+      display: none; /* Initially hidden, JS will toggle */
+      position: fixed; /* Full-screen overlay */
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      /* Use flex to center the loader */
+      align-items: center;
+      justify-content: center;
+      background: rgba(244, 246, 249, 0.9); /* Use background color with opacity */
+      z-index: 2000; /* Ensure it's on top of other content */
+      
+      /* Re-activate text styles */
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--subtle-text-color);
+    }
+
+    .loader-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      gap: 1rem; /* Space between loader and text */
+    }
+    
+    .loader-content p {
+      margin: 0;
+    }
+
+    /* --- NEW LOADER CSS --- */
+    .loader {
+      width: 45px;
+      height: 90px;
+      position: relative;
+    }
+    .loader:after {
+      content: "";
+      position: absolute;
+      inset: 0 0 20px;
+      border-radius: 15px 15px 10px 10px;
+      padding: 1px;
+      background: repeating-linear-gradient(-45deg, #91d2e2 0 8px, #1296a7 0 12px)
+        content-box;
+      --c: radial-gradient(farthest-side, #000 94%, #0000);
+      -webkit-mask:
+        linear-gradient(#0000 0 0),
+        var(--c) -10px -10px,
+        var(--c) 15px -14px,
+        var(--c) 9px -6px,
+        var(--c) -12px 9px,
+        var(--c) 14px 9px,
+        var(--c) 23px 27px,
+        var(--c) -8px 35px,
+        var(--c) 50% 50%,
+        linear-gradient(#000 0 0);
+      mask:
+        linear-gradient(#000 0 0),
+        var(--c) -10px -10px,
+        var(--c) 15px -14px,
+        var(--c) 9px -6px,
+        var(--c) -12px 9px,
+        var(--c) 14px 9px,
+        var(--c) 23px 27px,
+        var(--c) -8px 35px,
+        var(--c) 50% 50%,
+        linear-gradient(#0000 0 0);
+      -webkit-mask-composite: destination-out;
+      mask-composite: exclude, add, add, add, add, add, add, add, add;
+      -webkit-mask-repeat: no-repeat;
+      animation: l2 3s infinite ease-out;
+    }
+    .loader:before {
+      content: "";
+      position: absolute;
+      inset: 50% calc(50% - 4px) 0;
+      background: #e0a267;
+      border-radius: 50px;
+    }
+    @keyframes l2 {
+      0% {
+        -webkit-mask-size:
+          auto,
+          0 0,
+          0 0,
+          0 0,
+          0 0,
+          0 0,
+          0 0,
+          0 0,
+          0 0;
+      }
+      10% {
+        -webkit-mask-size:
+          auto,
+          25px 25px,
+          0 0,
+          0 0,
+          0 0,
+          0 0,
+          0 0,
+          0 0,
+          0 0;
+      }
+      20% {
+        -webkit-mask-size:
+          auto,
+          25px 25px,
+          25px 25px,
+          0 0,
+          0 0,
+          0 0,
+          0 0,
+          0 0,
+          0 0;
+      }
+      30% {
+        -webkit-mask-size:
+          auto,
+          25px 25px,
+          25px 25px,
+          30px 30px,
+          0 0,
+          0 0,
+          0 0,
+          0 0,
+          0 0;
+      }
+      40% {
+        -webkit-mask-size:
+          auto,
+          25px 25px,
+          25px 25px,
+          30px 30px,
+          30px 30px,
+          0 0,
+          0 0,
+          0 0,
+          0 0;
+      }
+      50% {
+        -webkit-mask-size:
+          auto,
+          25px 25px,
+          25px 25px,
+          30px 30px,
+          30px 30px,
+          25px 25px,
+          0 0,
+          0 0,
+          0 0;
+      }
+      60% {
+        -webkit-mask-size:
+          auto,
+          25px 25px,
+          25px 25px,
+          30px 30px,
+          30px 30px,
+          25px 25px,
+          25px 25px,
+          0 0,
+          0 0;
+      }
+      70% {
+        -webkit-mask-size:
+          auto,
+          25px 25px,
+          25px 25px,
+          30px 30px,
+          30px 30px,
+          25px 25px,
+          25px 25px,
+          25px 25px,
+          0 0;
+      }
+      80%,
+      100% {
+        -webkit-mask-size:
+          auto,
+          25px 25px,
+          25px 25px,
+          30px 30px,
+          30px 30px,
+          25px 25px,
+          25px 25px,
+          25px 25px,
+          200% 200%;
+      }
+    }
+
+
+    /* Lightbox Modal */
+    #lightbox-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    #lightbox-content {
+      background: rgb(255 255 255);
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      max-width: 600px;
+      width: 100%;
+      position: relative;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      font-size: 2.5rem;
+      color: #aaa;
+      cursor: pointer;
+      line-height: 1;
+      transition: color 0.2s;
+    }
+    .close-btn:hover { color: var(--text-color); }
+    
     @keyframes fadeInUp {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
@@ -239,9 +496,18 @@
         <label for="topic">What do you want to learn?</label>
         <input type="text" id="topic" name="topic" placeholder="e.g., Python" required>
       </div>
+
       <div class="input-group">
-        <label for="duration">How much time to finish?</label>
-        <input type="text" id="duration" name="duration" placeholder="e.g., 7 days, 2 months, 90 days" required>
+        <label for="duration-value">How much time to finish?</label>
+        <div class="duration-input-container">
+          <input type="number" id="duration-value" name="duration-value" placeholder="e.g., 7" min="1" required>
+          <select id="duration-unit" name="duration-unit">
+            <option value="days" selected>Days</option>
+            <option value="weeks">Weeks</option>
+            <option value="months">Months</option>
+            <option value="years">Years</option>
+          </select>
+        </div>
       </div>
       <div class="input-group">
         <label for="commitment">How many hours per day?</label>
@@ -250,7 +516,12 @@
       <button type="submit">Generate Schedule</button>
     </form>
 
-    <div id="loading">Generating your plan... Please wait.</div>
+    <div id="loading">
+      <div class="loader-content">
+        <div class="loader"></div>
+        <p>Generating your plan... Please wait.</p>
+      </div>
+    </div>
     <div id="schedule-container"></div>
   </div>
 
@@ -281,12 +552,16 @@
       container.innerHTML = ''; // Clear previous results
       scheduleDataCache = []; // Reset the cache for a new schedule
 
+      let isFirstCard = true;
+
+      const durationValue = document.getElementById('duration-value').value;
+      const durationUnit = document.getElementById('duration-unit').value;
+      
       const formData = {
         topic: document.getElementById('topic').value,
-        total_duration: document.getElementById('duration').value,
+        total_duration: `${durationValue} ${durationUnit}`, // e.g., "7 days"
         daily_commitment: document.getElementById('commitment').value
       };
-
       try {
         const response = await fetch('/generate-schedule', {
           method: 'POST',
@@ -303,15 +578,12 @@
         const decoder = new TextDecoder();
         let buffer = ''; // Buffer to store partial chunks
 
-        // Read the stream until it's done
         while (true) {
           const { done, value } = await reader.read();
           if (done) break; // Stream finished
 
-          // Add the new chunk to our buffer
           buffer += decoder.decode(value, { stream: true });
           
-          // Process all complete lines (JSON objects) in the buffer
           while (buffer.includes('\n')) {
             const newlineIndex = buffer.indexOf('\n');
             const line = buffer.substring(0, newlineIndex).trim();
@@ -321,14 +593,15 @@
               try {
                 const dayData = JSON.parse(line);
                 
-                // Check for the error object sent from the server
                 if (dayData.error) {
                   throw new Error(dayData.error);
                 }
+                if (isFirstCard) {
+                  loadingIndicator.style.display = 'none';
+                  isFirstCard = false;
+                }
                 
-                // 1. Add this day to the cache
                 scheduleDataCache.push(dayData);
-                // 2. Append the new card to the UI immediately
                 appendDayCard(dayData, scheduleDataCache.length - 1);
                 
               } catch (e) {
@@ -352,8 +625,6 @@
     function appendDayCard(day, index) {
       const exerciseSummary = day.exercise.length > 100 ? day.exercise.substring(0, 100) + '...' : day.exercise;
       
-      // Smartly determine the period text
-      // Handles "Day 1", "Day 1-2", "Month 1", etc.
       const periodText = String(day.day).toLowerCase().includes('month') 
         ? day.day 
         : `Day ${day.day}`;
@@ -367,7 +638,6 @@
           <p>${exerciseSummary}</p>
         </div>
       `;
-      // insertAdjacentHTML is more efficient than innerHTML +=
       container.insertAdjacentHTML('beforeend', cardHTML);
     }
 
@@ -421,7 +691,6 @@
       lightboxOverlay.style.display = 'flex';
     }
 
-    /** Closes the lightbox modal. */
     function closeLightbox() {
       document.body.classList.remove('no-scroll');
       lightboxOverlay.style.display = 'none';
@@ -435,7 +704,6 @@
         return;
       }
       
-      // Helper to escape XML special characters
       const escapeXML = (str) => String(str).replace(/[<>&'"]/g, c => 
         ({'<':'&lt;','>':'&gt;','&':'&amp;','\'':'&apos;','"':'&quot;'}[c])
       );
@@ -443,7 +711,7 @@
       let xmlString = '<?xml version="1.0" encoding="UTF-8"?>\n<schedule>\n';
       
       scheduleDataCache.forEach(day => {
-        xmlString += `  <day id="${day.day}">\n`; // Use 'day' as ID, works for "1", "1-2", "Month 1"
+        xmlString += `  <day id="${day.day}">\n`;
         xmlString += `    <topic>${escapeXML(day.topic_of_the_day)}</topic>\n`;
         xmlString += `    <tasks>\n`;
         day.tasks.forEach(task => { xmlString += `      <task>${escapeXML(task)}</task>\n`; });
@@ -454,7 +722,6 @@
       
       xmlString += '</schedule>';
       
-      // Create a blob and trigger download
       const blob = new Blob([xmlString], { type: 'application/xml' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -476,7 +743,6 @@
           const parser = new DOMParser();
           const xmlDoc = parser.parseFromString(e.target.result, "application/xml");
           
-          // Check for XML parsing errors
           if (xmlDoc.getElementsByTagName("parsererror").length) {
             throw new Error("Failed to parse XML. File may be corrupt.");
           }
@@ -486,7 +752,7 @@
           
           for (const dayNode of dayNodes) {
             const dayData = {
-              day: dayNode.getAttribute("id"), // Get the ID ("1", "1-2", "Month 1")
+              day: dayNode.getAttribute("id"),
               topic_of_the_day: dayNode.querySelector("topic").textContent,
               tasks: Array.from(dayNode.querySelectorAll("tasks task")).map(task => task.textContent),
               exercise: dayNode.querySelector("exercise").textContent
@@ -494,9 +760,7 @@
             importedData.push(dayData);
           }
           
-          // 1. Set the cache
           scheduleDataCache = importedData;
-          // 2. Display the *entire* schedule (don't stream)
           displaySchedule(scheduleDataCache);
           
         } catch (error) {
@@ -506,27 +770,22 @@
       };
       
       reader.readAsText(file);
-      // Reset file input to allow importing the same file again
       fileInput.value = '';
     }
 
     // --- 6. Event Listeners ---
     
-    // Main form
     form.addEventListener('submit', handleScheduleGeneration);
     
-    // Lightbox controls
     closeBtn.addEventListener('click', closeLightbox);
     lightboxOverlay.addEventListener('click', (event) => { 
-      // Close if user clicks on the dark overlay, but not the content
       if (event.target === lightboxOverlay) closeLightbox(); 
     });
     document.addEventListener('keydown', (event) => { 
       if (event.key === 'Escape') closeLightbox(); 
     });
     
-    // Import/Export buttons
-    importBtn.addEventListener('click', () => fileInput.click()); // Trigger hidden input
+    importBtn.addEventListener('click', () => fileInput.click());
     exportBtn.addEventListener('click', exportToXML);
     fileInput.addEventListener('change', handleFileImport);
     
