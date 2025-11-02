@@ -27,6 +27,7 @@
       color: var(--text-color);
       transition: background 0.3s ease;
     }
+    /* Utility class to prevent background scroll when lightbox is open */
     body.no-scroll { overflow: hidden; }
 
     .container {
@@ -60,6 +61,7 @@
       box-shadow: var(--shadow);
       transition: all 0.3s ease;
       width: auto;
+      cursor: pointer;
     }
     .action-buttons button:hover {
       background: var(--primary-gradient);
@@ -96,6 +98,7 @@
       font-size: 16px;
       background: #fff;
       transition: all 0.3s ease;
+      box-sizing: border-box; /* Ensures padding doesn't affect width */
     }
     input:focus {
       border-color: var(--primary-color);
@@ -103,7 +106,7 @@
       outline: none;
     }
 
-    button {
+    button[type="submit"] {
       width: 100%;
       padding: 14px;
       background: var(--primary-gradient);
@@ -116,7 +119,7 @@
       box-shadow: var(--shadow);
       transition: all 0.3s ease;
     }
-    button:hover {
+    button[type="submit"]:hover {
       transform: translateY(-2px);
       box-shadow: 0 8px 20px rgba(0, 122, 255, 0.25);
     }
@@ -145,6 +148,7 @@
       font-size: 1.2rem;
       font-weight: 600;
       color: var(--primary-color);
+      margin-top: 0;
     }
     .day-card h3 {
       margin-top: 1rem;
@@ -178,7 +182,7 @@
       padding: 40px;
     }
 
-    /* Lightbox */
+    /* Lightbox Modal */
     #lightbox-overlay {
       position: fixed;
       top: 0; left: 0;
@@ -237,7 +241,7 @@
       </div>
       <div class="input-group">
         <label for="duration">How much time to finish?</label>
-        <input type="text" id="duration" name="duration" placeholder="e.g., 7 days" required>
+        <input type="text" id="duration" name="duration" placeholder="e.g., 7 days, 2 months, 90 days" required>
       </div>
       <div class="input-group">
         <label for="commitment">How many hours per day?</label>
@@ -258,6 +262,7 @@
   </div>
 
   <script>
+    // --- 1. DOM Element Caching ---
     const form = document.getElementById('schedule-form');
     const container = document.getElementById('schedule-container');
     const loadingIndicator = document.getElementById('loading');
@@ -267,14 +272,14 @@
     const importBtn = document.getElementById('import-btn');
     const exportBtn = document.getElementById('export-btn');
     const fileInput = document.getElementById('file-input');
+    
     let scheduleDataCache = null;
 
-    // --- REWRITTEN for streaming JSON Lines ---
-    form.addEventListener('submit', async (event) => {
+    async function handleScheduleGeneration(event) {
       event.preventDefault();
       loadingIndicator.style.display = 'block';
-      container.innerHTML = ''; // Clear the container
-      scheduleDataCache = []; // Reset the cache
+      container.innerHTML = ''; // Clear previous results
+      scheduleDataCache = []; // Reset the cache for a new schedule
 
       const formData = {
         topic: document.getElementById('topic').value,
@@ -288,35 +293,42 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData)
         });
-        if (!response.ok) throw new Error('Network response was not ok');
+        
+        if (!response.ok) {
+          throw new Error(`Network response was not ok (${response.status})`);
+        }
 
-        // --- Logic to read the stream line by line ---
+        // --- Streaming Response Logic ---
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
-        let buffer = '';
+        let buffer = ''; // Buffer to store partial chunks
 
+        // Read the stream until it's done
         while (true) {
           const { done, value } = await reader.read();
-          if (done) break;
+          if (done) break; // Stream finished
 
+          // Add the new chunk to our buffer
           buffer += decoder.decode(value, { stream: true });
           
           // Process all complete lines (JSON objects) in the buffer
           while (buffer.includes('\n')) {
             const newlineIndex = buffer.indexOf('\n');
             const line = buffer.substring(0, newlineIndex).trim();
-            buffer = buffer.substring(newlineIndex + 1);
+            buffer = buffer.substring(newlineIndex + 1); // Keep the remainder
 
             if (line) {
               try {
                 const dayData = JSON.parse(line);
+                
+                // Check for the error object sent from the server
                 if (dayData.error) {
                   throw new Error(dayData.error);
                 }
                 
-                // Add this day to the cache
+                // 1. Add this day to the cache
                 scheduleDataCache.push(dayData);
-                // Append the new card to the UI immediately
+                // 2. Append the new card to the UI immediately
                 appendDayCard(dayData, scheduleDataCache.length - 1);
                 
               } catch (e) {
@@ -333,14 +345,22 @@
       } finally {
         loadingIndicator.style.display = 'none';
       }
-    });
+    }
 
-    // --- NEW Function: Appends a single card to the container ---
+    // --- 3. UI Helper Functions ---
+
     function appendDayCard(day, index) {
       const exerciseSummary = day.exercise.length > 100 ? day.exercise.substring(0, 100) + '...' : day.exercise;
+      
+      // Smartly determine the period text
+      // Handles "Day 1", "Day 1-2", "Month 1", etc.
+      const periodText = String(day.day).toLowerCase().includes('month') 
+        ? day.day 
+        : `Day ${day.day}`;
+      
       const cardHTML = `
         <div class="day-card" onclick="openLightbox(${index})">
-          <h2>Day ${day.day}: ${day.topic_of_the_day}</h2>
+          <h2>${periodText}: ${day.topic_of_the_day}</h2>
           <h3>Tasks:</h3>
           <ul>${day.tasks.slice(0, 2).map(task => `<li>${task}</li>`).join('')} ${day.tasks.length > 2 ? '<li>...</li>' : ''}</ul>
           <strong>Exercise:</strong>
@@ -351,18 +371,22 @@
       container.insertAdjacentHTML('beforeend', cardHTML);
     }
 
-    // --- UNCHANGED: Used for displaying imported XML data ---
     function displaySchedule(scheduleData) {
       if (!scheduleData || scheduleData.length === 0) {
         container.innerHTML = '';
         return;
       }
+      
       let scheduleHTML = '';
       scheduleData.forEach((day, index) => {
         const exerciseSummary = day.exercise.length > 100 ? day.exercise.substring(0, 100) + '...' : day.exercise;
+        const periodText = String(day.day).toLowerCase().includes('month') 
+          ? day.day 
+          : `Day ${day.day}`;
+          
         scheduleHTML += `
           <div class="day-card" onclick="openLightbox(${index})">
-            <h2>Day ${day.day}: ${day.topic_of_the_day}</h2>
+            <h2>${periodText}: ${day.topic_of_the_day}</h2>
             <h3>Tasks:</h3>
             <ul>${day.tasks.slice(0, 2).map(task => `<li>${task}</li>`).join('')} ${day.tasks.length > 2 ? '<li>...</li>' : ''}</ul>
             <strong>Exercise:</strong>
@@ -373,35 +397,53 @@
       container.innerHTML = scheduleHTML;
     }
 
-    // --- UNCHANGED: Lightbox ---
+    // --- 4. Lightbox (Modal) Logic ---
+
     function openLightbox(index) {
+      if (!scheduleDataCache || !scheduleDataCache[index]) return;
+      
       document.body.classList.add('no-scroll');
       const day = scheduleDataCache[index];
+      
+      const periodText = String(day.day).toLowerCase().includes('month') 
+        ? day.day 
+        : `Day ${day.day}`;
+
       let lightboxHTML = `
-        <h2>Day ${day.day}: ${day.topic_of_the_day}</h2>
+        <h2>${periodText}: ${day.topic_of_the_day}</h2>
         <h3>Tasks:</h3>
         <ul>${day.tasks.map(task => `<li>${task}</li>`).join('')}</ul>
         <strong>Exercise:</strong>
         <p>${day.exercise}</p>
       `;
+      
       lightboxBody.innerHTML = lightboxHTML;
       lightboxOverlay.style.display = 'flex';
     }
+
+    /** Closes the lightbox modal. */
     function closeLightbox() {
       document.body.classList.remove('no-scroll');
       lightboxOverlay.style.display = 'none';
     }
 
-    // --- UNCHANGED: Export ---
+    // --- 5. Import / Export Logic ---
+
     function exportToXML() {
       if (!scheduleDataCache || scheduleDataCache.length === 0) {
         alert('Please generate a schedule first.');
         return;
       }
-      const escapeXML = (str) => String(str).replace(/[<>&'"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','\'':'&apos;','"':'&quot;'}[c]));
+      
+      // Helper to escape XML special characters
+      const escapeXML = (str) => String(str).replace(/[<>&'"]/g, c => 
+        ({'<':'&lt;','>':'&gt;','&':'&amp;','\'':'&apos;','"':'&quot;'}[c])
+      );
+      
       let xmlString = '<?xml version="1.0" encoding="UTF-8"?>\n<schedule>\n';
+      
       scheduleDataCache.forEach(day => {
-        xmlString += `  <day id="${day.day}">\n`;
+        xmlString += `  <day id="${day.day}">\n`; // Use 'day' as ID, works for "1", "1-2", "Month 1"
         xmlString += `    <topic>${escapeXML(day.topic_of_the_day)}</topic>\n`;
         xmlString += `    <tasks>\n`;
         day.tasks.forEach(task => { xmlString += `      <task>${escapeXML(task)}</task>\n`; });
@@ -409,7 +451,10 @@
         xmlString += `    <exercise>${escapeXML(day.exercise)}</exercise>\n`;
         xmlString += `  </day>\n`;
       });
+      
       xmlString += '</schedule>';
+      
+      // Create a blob and trigger download
       const blob = new Blob([xmlString], { type: 'application/xml' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -421,47 +466,70 @@
       URL.revokeObjectURL(url);
     }
 
-    // --- UNCHANGED: Import ---
     function handleFileImport(event) {
       const file = event.target.files[0];
       if (!file) return;
+      
       const reader = new FileReader();
       reader.onload = (e) => {
         try {
           const parser = new DOMParser();
           const xmlDoc = parser.parseFromString(e.target.result, "application/xml");
+          
+          // Check for XML parsing errors
           if (xmlDoc.getElementsByTagName("parsererror").length) {
-            throw new Error("Failed to parse XML.");
+            throw new Error("Failed to parse XML. File may be corrupt.");
           }
+          
           const importedData = [];
           const dayNodes = xmlDoc.getElementsByTagName("day");
+          
           for (const dayNode of dayNodes) {
             const dayData = {
-              day: dayNode.getAttribute("id"),
+              day: dayNode.getAttribute("id"), // Get the ID ("1", "1-2", "Month 1")
               topic_of_the_day: dayNode.querySelector("topic").textContent,
               tasks: Array.from(dayNode.querySelectorAll("tasks task")).map(task => task.textContent),
               exercise: dayNode.querySelector("exercise").textContent
             };
             importedData.push(dayData);
           }
+          
+          // 1. Set the cache
           scheduleDataCache = importedData;
-          displaySchedule(scheduleDataCache); // Uses the original display function
+          // 2. Display the *entire* schedule (don't stream)
+          displaySchedule(scheduleDataCache);
+          
         } catch (error) {
           alert('Error importing file. Please ensure it is a valid schedule XML file.');
           console.error("XML Import Error:", error);
         }
       };
+      
       reader.readAsText(file);
+      // Reset file input to allow importing the same file again
       fileInput.value = '';
     }
 
-    // --- UNCHANGED: Event listeners ---
+    // --- 6. Event Listeners ---
+    
+    // Main form
+    form.addEventListener('submit', handleScheduleGeneration);
+    
+    // Lightbox controls
     closeBtn.addEventListener('click', closeLightbox);
-    lightboxOverlay.addEventListener('click', (event) => { if (event.target === lightboxOverlay) closeLightbox(); });
-    document.addEventListener('keydown', (event) => { if (event.key === 'Escape') closeLightbox(); });
-    importBtn.addEventListener('click', () => fileInput.click());
+    lightboxOverlay.addEventListener('click', (event) => { 
+      // Close if user clicks on the dark overlay, but not the content
+      if (event.target === lightboxOverlay) closeLightbox(); 
+    });
+    document.addEventListener('keydown', (event) => { 
+      if (event.key === 'Escape') closeLightbox(); 
+    });
+    
+    // Import/Export buttons
+    importBtn.addEventListener('click', () => fileInput.click()); // Trigger hidden input
     exportBtn.addEventListener('click', exportToXML);
     fileInput.addEventListener('change', handleFileImport);
+    
   </script>
 </body>
 </html>
