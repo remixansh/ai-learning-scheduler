@@ -504,7 +504,7 @@
       <div class="input-group">
         <label for="duration-value">How much time to finish?</label>
         <div class="duration-input-container">
-          <input type="number" id="duration-value" name="duration-value" placeholder="e.g., 7" min="1" max="24" required>
+          <input type="number" id="duration-value" name="duration-value" placeholder="e.g., 7" min="1" required>
           <select id="duration-unit" name="duration-unit">
             <option value="days" selected>Days</option>
             <option value="weeks">Weeks</option>
@@ -515,7 +515,7 @@
       </div>
       <div class="input-group">
         <label for="commitment">How many hours per day?</label>
-        <input type="text" id="commitment" name="commitment" placeholder="e.g., 2 hours" required>
+        <input type="number" id="commitment" name="commitment" placeholder="e.g., 2 hours" max="24" required>
       </div>
       <button type="submit">Generate Schedule</button>
     </form>
