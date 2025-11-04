@@ -504,7 +504,7 @@
       <div class="input-group">
         <label for="duration-value">How much time to finish?</label>
         <div class="duration-input-container">
-          <input type="number" id="duration-value" name="duration-value" placeholder="e.g., 7" min="1" required>
+          <input type="number" id="duration-value" name="duration-value" placeholder="e.g., 7" min="1" max="24" required>
           <select id="duration-unit" name="duration-unit">
             <option value="days" selected>Days</option>
             <option value="weeks">Weeks</option>
@@ -564,7 +564,7 @@
       const formData = {
         topic: document.getElementById('topic').value,
         total_duration: `${durationValue} ${durationUnit}`, // e.g., "7 days"
-        daily_commitment: document.getElementById('commitment').value
+        daily_commitment: `${commitmentValue} hours`
       };
       try {
         const response = await fetch('/generate-schedule', {
