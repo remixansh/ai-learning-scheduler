@@ -86,10 +86,11 @@ def get_schedule_granularity(total_days: int, original_duration_str: str) -> Tup
     """
     duration_lower = original_duration_str.lower()
     
-    if "month" in duration_lower or "year" in duration_lower:
+    if (total_days > 366) or ("month" in duration_lower or "year" in duration_lower):
         period_instruction = "Your schedule should be monthly (e.g., 'Month 1', 'Month 2')."
         json_day_field = '"day": "<string>"'
         json_example = '"day": "Month 1"'
+        
     # Check for long-term plans (10-day blocks)
     elif 180 < total_days <= 366:
         period_instruction = "Your schedule should be in 10-day blocks (e.g., '1-10', '11-20')."
@@ -140,10 +141,10 @@ Daily Commitment: "{request.daily_commitment}"
 4.  DO NOT include any text, explanations, or markdown formatting before or after the JSON objects.
 
 The JSON structure for EACH LINE must be:
-{{"day": {json_day_field}, "topic_of_the_day": "<string>", "tasks": ["<string>", ...], "exercise": "<string>"}}
+{{{json_day_field}, "topic_of_the_day": "<string>", "tasks": ["<string>", ...], "exercise": "<string>"}}
 
 Example of a single line of output:
-{{"day": {json_example}, "topic_of_the_day": "Example Topic for the Period", "tasks": ["Task 1", "Task 2"], "exercise": "Example exercise for the period"}}
+{{{json_example}, "topic_of_the_day": "Example Topic for the Period", "tasks": ["Task 1", "Task 2"], "exercise": "Example exercise for the period"}}
 """
 
 async def stream_json_objects(request: ScheduleRequest) -> AsyncGenerator[str, None]:
