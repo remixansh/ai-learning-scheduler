@@ -1387,6 +1387,27 @@
       font-size: 14px;
     }
 
+    /* Clear all button */
+    .todo-clear-all {
+      display: block;
+      margin: 24px auto 0;
+      padding: 6px 16px;
+      font-size: 12px;
+      font-weight: 500;
+      font-family: inherit;
+      color: var(--text-tertiary);
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+
+    .todo-clear-all:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
     /* FAB for adding tasks (bottom right) */
     .todo-fab {
       display: none;
@@ -3150,6 +3171,11 @@
       }
 
       list.innerHTML = html;
+
+      // Add clear all button at the bottom
+      if (todos.length > 0) {
+        list.innerHTML += '<button class="todo-clear-all" onclick="clearAllTodos()">Clear all</button>';
+      }
     }
 
     function buildTodoItem(t, idx, animIdx) {
@@ -3186,6 +3212,12 @@
       todos.splice(idx, 1);
       setTodos(todos);
       renderTodoList();
+    }
+
+    function clearAllTodos() {
+      setTodos([]);
+      renderTodoList();
+      showToast('All tasks cleared');
     }
 
     function openTodoInput() {
