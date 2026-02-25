@@ -1120,6 +1120,56 @@
     }
 
     /* ========================================
+       MOBILE BOTTOM NAV
+       ======================================== */
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 8px 0;
+      padding-bottom: max(8px, env(safe-area-inset-bottom));
+      z-index: 900;
+    }
+
+    .mobile-nav-inner {
+      display: flex;
+      justify-content: space-around;
+      max-width: 300px;
+      margin: 0 auto;
+    }
+
+    .mobile-nav-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      padding: 6px 16px;
+      font-size: 11px;
+      font-weight: 500;
+      font-family: inherit;
+      color: var(--text-tertiary);
+      background: transparent;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+
+    .mobile-nav-btn.active {
+      color: var(--accent);
+    }
+
+    .mobile-nav-btn svg {
+      width: 22px;
+      height: 22px;
+      stroke-width: 1.8;
+    }
+
+    /* ========================================
        RESPONSIVE
        ======================================== */
     @media (max-width: 640px) {
@@ -1170,54 +1220,6 @@
       .footer {
         padding-bottom: 80px;
       }
-    }
-
-    /* Mobile bottom nav */
-    .mobile-nav {
-      display: none;
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: var(--surface);
-      border-top: 1px solid var(--border);
-      padding: 8px 0;
-      padding-bottom: max(8px, env(safe-area-inset-bottom));
-      z-index: 900;
-    }
-
-    .mobile-nav-inner {
-      display: flex;
-      justify-content: space-around;
-      max-width: 300px;
-      margin: 0 auto;
-    }
-
-    .mobile-nav-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 3px;
-      padding: 6px 16px;
-      font-size: 11px;
-      font-weight: 500;
-      font-family: inherit;
-      color: var(--text-tertiary);
-      background: transparent;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all var(--transition);
-    }
-
-    .mobile-nav-btn.active {
-      color: var(--accent);
-    }
-
-    .mobile-nav-btn svg {
-      width: 22px;
-      height: 22px;
-      stroke-width: 1.8;
     }
   </style>
 </head>
@@ -1651,7 +1653,7 @@
           displaySchedule(scheduleDataCache);
 
         } catch (error) {
-          alert('Error importing file. Please ensure it is a valid schedule XML file.');
+          showToast('Invalid schedule file');
           console.error("XML Import Error:", error);
         }
       };
@@ -1742,12 +1744,22 @@
       setTimeout(() => switchTab('progress'), 400);
     }
 
+    let pendingDeleteId = null;
+
     function deleteRoutine(id) {
-      if (!confirm('Delete this routine?')) return;
-      const routines = getRoutines().filter(r => r.id !== id);
-      setRoutines(routines);
-      renderRoutines();
-      showToast('Routine deleted');
+      if (pendingDeleteId === id) {
+        // Second click = confirmed
+        const routines = getRoutines().filter(r => r.id !== id);
+        setRoutines(routines);
+        renderRoutines();
+        showToast('Routine deleted');
+        pendingDeleteId = null;
+      } else {
+        // First click = ask to confirm via toast
+        pendingDeleteId = id;
+        showToast('Tap delete again to confirm');
+        setTimeout(() => { pendingDeleteId = null; }, 3000);
+      }
     }
 
     function getRoutineProgress(routine) {
@@ -1812,7 +1824,7 @@
 
         html += '<div class="routine-card" id="routine-' + routine.id + '" style="animation-delay:' + (rIdx * 0.06) + 's">' +
           '<div class="routine-header" onclick="toggleRoutine(\'' + routine.id + '\')">' +
-          '<div class="routine-icon">\ud83d\udcda</div>' +
+          '<div class="routine-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>' +
           '<div class="routine-info">' +
           '<div class="routine-title">' + routine.topic + '</div>' +
           '<div class="routine-meta">' + daysCount + ' days \u00b7 Saved ' + dateStr + '</div>' +
