@@ -9,6 +9,7 @@ from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Tuple, AsyncGenerator
+import httpx
 
 # --- Application Setup ---
 
@@ -76,36 +77,34 @@ def parse_duration_to_days(duration_str: str) -> int:
     
     return num  
 
-def get_schedule_granularity(total_days: int, original_duration_str: str) -> Tuple[str, str, str]:
+def get_schedule_granularity(total_days: int) -> Tuple[str, str, str]:
     """
     Determines the prompt instructions and JSON structure based on the total days.
-    Prioritizes 'month' or 'year' inputs from the user.
     
     Returns:
         A tuple: (period_instruction, json_day_field_type, json_example_value)
     """
-    duration_lower = original_duration_str.lower()
     
-    if "month" in duration_lower or "year" in duration_lower:
+    if total_days > 365:
         period_instruction = "Your schedule should be monthly (e.g., 'Month 1', 'Month 2')."
         json_day_field = '"day": "<string>"'
         json_example = '"day": "Month 1"'
-    # Check for long-term plans (10-day blocks)
-    elif 180 < total_days <= 366:
+        
+    elif 180 < total_days <= 365:
         period_instruction = "Your schedule should be in 10-day blocks (e.g., '1-10', '11-20')."
         json_day_field = '"day": "<string>"'
         json_example = '"day": "1-10"'
-    # Check for medium-term plans (5-day blocks)
+        
     elif 60 < total_days <= 180:
         period_instruction = "Your schedule should be in 5-day blocks (e.g., '1-5', '6-10')."
         json_day_field = '"day": "<string>"'
         json_example = '"day": "1-5"'
-    # Check for short-to-medium plans (2-day blocks)
+        
     elif 30 < total_days <= 60:
         period_instruction = "Your schedule should be in 2-day blocks (e.g., '1-2', '3-4')."
         json_day_field = '"day": "<string>"'
         json_example = '"day": "1-2"'
-    # Default for short plans (daily)
+        
     else: # <= 30 days
         period_instruction = "Your schedule should be daily (Day 1, Day 2...)."
         json_day_field = '"day": <integer>'
@@ -121,8 +120,7 @@ def create_streaming_prompt(request: ScheduleRequest) -> str:
     total_days = parse_duration_to_days(request.total_duration)
     
     period_instruction, json_day_field, json_example = get_schedule_granularity(
-        total_days, 
-        request.total_duration  
+        total_days
     )
 
     return f"""
@@ -140,10 +138,10 @@ Daily Commitment: "{request.daily_commitment}"
 4.  DO NOT include any text, explanations, or markdown formatting before or after the JSON objects.
 
 The JSON structure for EACH LINE must be:
-{{"day": {json_day_field}, "topic_of_the_day": "<string>", "tasks": ["<string>", ...], "exercise": "<string>"}}
+{{{json_day_field}, "topic_of_the_day": "<string>", "tasks": ["<string>", ...], "exercise": "<string>"}}
 
 Example of a single line of output:
-{{"day": {json_example}, "topic_of_the_day": "Example Topic for the Period", "tasks": ["Task 1", "Task 2"], "exercise": "Example exercise for the period"}}
+{{{json_example}, "topic_of_the_day": "Example Topic for the Period", "tasks": ["Task 1", "Task 2"], "exercise": "Example exercise for the period"}}
 """
 
 async def stream_json_objects(request: ScheduleRequest) -> AsyncGenerator[str, None]:
@@ -177,6 +175,48 @@ async def stream_json_objects(request: ScheduleRequest) -> AsyncGenerator[str, N
         yield error_payload + '\n'
 
 # --- API Endpoints ---
+
+@app.get("/get-videos")
+async def get_videos(topic: str):
+    """
+    Fetches top 5 relevant videos from YouTube Data API based on the topic.
+    """
+    youtube_api_key = os.getenv("YOUTUBE_API_KEY")
+    if not youtube_api_key:
+        raise HTTPException(status_code=500, detail="YOUTUBE_API_KEY not configured.")
+
+    search_query = f"{topic} tutorial"
+    url = "https://www.googleapis.com/youtube/v3/search"
+    params = {
+        "part": "snippet",
+        "maxResults": 5,
+        "q": search_query,
+        "type": "video",
+        "key": youtube_api_key
+    }
+
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.get(url, params=params)
+            response.raise_for_status()
+            data = response.json()
+            
+            videos = []
+            for item in data.get("items", []):
+                snippet = item["snippet"]
+                videos.append({
+                    "title": snippet["title"],
+                    "thumbnail": snippet["thumbnails"]["medium"]["url"],
+                    "videoId": item["id"]["videoId"],
+                    "channelTitle": snippet["channelTitle"]
+                })
+            return videos[:5]
+        except httpx.HTTPStatusError as e:
+            print(f"YouTube API Error: {e}")
+            raise HTTPException(status_code=500, detail="Failed to fetch videos from YouTube.")
+        except Exception as e:
+            print(f"Unexpected Error: {e}")
+            raise HTTPException(status_code=500, detail="An unexpected error occurred.")
 
 @app.get("/", response_class=HTMLResponse)
 async def serve_homepage():

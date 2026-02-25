@@ -1,270 +1,379 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI Learning Scheduler</title>
+  <meta name="description"
+    content="Generate personalized AI-powered learning schedules with curated video recommendations.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    /* ========================================
+       DESIGN TOKENS
+       ======================================== */
     :root {
-      --primary-color: #007aff;
-      --primary-gradient: linear-gradient(135deg, #007aff, #00c6ff);
-      --background-color: #f4f6f9;
-      --card-background: rgba(255, 255, 255, 0.9);
-      --text-color: #1c1c1e;
-      --subtle-text-color: #6d6d72;
-      --border-color: #e5e5ea;
-      --shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+      --accent: #E8684A;
+      --accent-light: #FDEEE9;
+      --accent-hover: #D45A3E;
+      --bg: #FAFBF9;
+      --surface: #FFFFFF;
+      --text: #1A1A1A;
+      --text-secondary: #7A7A7A;
+      --text-tertiary: #A0A0A0;
+      --border: #EBEBEB;
+      --border-hover: #D4D4D4;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.08);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --transition: 0.2s ease;
+    }
+
+    /* ========================================
+       RESET & BASE
+       ======================================== */
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      margin: 0;
-      padding: 20px;
-      background: var(--background-color);
-      color: var(--text-color);
-      transition: background 0.3s ease;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
-    body.no-scroll { overflow: hidden; }
 
+    body.no-scroll {
+      overflow: hidden;
+    }
+
+    /* ========================================
+       LAYOUT
+       ======================================== */
     .container {
-      max-width: 1200px;
+      max-width: 960px;
       margin: 0 auto;
+      padding: 0 24px;
     }
 
-    h1 {
+    /* ========================================
+       HEADER
+       ======================================== */
+    .header {
+      padding: 48px 0 40px;
       text-align: center;
-      font-weight: 700;
-      margin-bottom: 2rem;
-      color: var(--text-color);
-      font-size: 2rem;
     }
-    h1 span { color: var(--primary-color); }
 
-    .action-buttons {
+    .header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--text);
+    }
+
+    .header h1 span {
+      color: var(--accent);
+    }
+
+    .header p {
+      margin-top: 8px;
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+
+    /* ========================================
+       ACTION BAR
+       ======================================== */
+    .action-bar {
       display: flex;
       justify-content: center;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-    }
-    .action-buttons button {
-      padding: 10px 20px;
-      font-size: 14px;
-      font-weight: 500;
-      background: var(--card-background);
-      color: var(--primary-color);
-      border: 1px solid var(--primary-color);
-      border-radius: 12px;
-      box-shadow: var(--shadow);
-      transition: all 0.3s ease;
-      width: auto;
-      cursor: pointer;
-    }
-    .action-buttons button:hover {
-      background: var(--primary-gradient);
-      color: #fff;
-      transform: translateY(-2px);
-      box-shadow: 0 6px 18px rgba(0, 122, 255, 0.25);
+      gap: 10px;
+      margin-bottom: 32px;
     }
 
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 18px;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: inherit;
+      color: var(--text-secondary);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+
+    .btn-ghost:hover {
+      color: var(--text);
+      border-color: var(--border-hover);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-ghost svg {
+      width: 15px;
+      height: 15px;
+      stroke-width: 2;
+    }
+
+    /* ========================================
+       FORM
+       ======================================== */
     .input-form {
-      background: var(--card-background);
-      padding: 2rem;
-      border-radius: 16px;
-      box-shadow: var(--shadow);
-      margin: 0 auto 2rem;
-      max-width: 800px;
-      backdrop-filter: blur(10px);
-    }
-    .input-group {
-      margin-bottom: 1.5rem;
-      position: relative;
-    }
-    .input-group label {
-      font-weight: 500;
-      color: var(--subtle-text-color);
-      font-size: 0.9rem;
-      margin-bottom: 0.5rem;
-      display: block;
-    }
-    input {
-      width: 100%;
-      padding: 14px;
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      font-size: 16px;
-      background: #fff;
-      transition: all 0.3s ease;
-      box-sizing: border-box; /* Ensures padding doesn't affect width */
-    }
-    input:focus {
-      border-color: var(--primary-color);
-      box-shadow: 0 0 8px rgba(0, 122, 255, 0.3);
-      outline: none;
+      background: var(--surface);
+      padding: 32px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      margin: 0 auto 48px;
+      max-width: 580px;
     }
 
-    button[type="submit"] {
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      letter-spacing: 0.01em;
+    }
+
+    input[type="text"],
+    input[type="number"] {
       width: 100%;
-      padding: 14px;
-      background: var(--primary-gradient);
-      color: white;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      font-size: 16px;
-      font-weight: 600;
-      box-shadow: var(--shadow);
-      transition: all 0.3s ease;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      font-family: inherit;
+      color: var(--text);
+      background: var(--bg);
+      transition: all var(--transition);
     }
-    button[type="submit"]:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(0, 122, 255, 0.25);
+
+    input[type="text"]:focus,
+    input[type="number"]:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-light);
+      background: var(--surface);
     }
-    
+
+    input::placeholder {
+      color: var(--text-tertiary);
+    }
+
     .duration-input-container {
       display: flex;
       gap: 10px;
     }
+
     .duration-input-container input[type="number"] {
-      width: 100%;
       flex: 1;
     }
+
     .duration-input-container select {
-      width: 120px;
+      width: 110px;
       flex-shrink: 0;
-      padding: 14px;
-      border: 5px solid var(--border-color);
-      border-radius: 12px;
-      font-size: 16px;
-      background: #fff;
-      transition: all 0.3s ease;
-      font-family: 'Inter', sans-serif; /* Inherit font */
-      color: var(--text-color); /* Inherit color */
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      font-family: inherit;
+      color: var(--text);
+      background: var(--bg);
+      transition: all var(--transition);
+      cursor: pointer;
     }
+
     .duration-input-container select:focus {
-      border-color: var(--primary-color);
-      box-shadow: 0 0 8px rgba(0, 122, 255, 0.3);
       outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-light);
     }
-    
 
+    .btn-primary {
+      width: 100%;
+      padding: 13px;
+      background: var(--accent);
+      color: #FFFFFF;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: inherit;
+      letter-spacing: 0.01em;
+      transition: all var(--transition);
+      margin-top: 4px;
+    }
 
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      box-shadow: 0 4px 14px rgba(232, 104, 74, 0.25);
+    }
+
+    .btn-primary:active {
+      transform: scale(0.985);
+    }
+
+    /* ========================================
+       SCHEDULE GRID
+       ======================================== */
     #schedule-container {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      padding-bottom: 64px;
     }
+
     .day-card {
-      background: var(--card-background);
-      border-radius: 16px;
-      padding: 1.5rem;
-      border: 1px solid var(--border-color);
-      box-shadow: var(--shadow);
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      border: 1px solid var(--border);
       cursor: pointer;
-      transition: all 0.3s ease;
-      backdrop-filter: blur(10px);
-      animation: fadeInUp 0.5s ease forwards;
+      transition: all var(--transition);
+      position: relative;
+      animation: cardFadeIn 0.4s ease forwards;
+      opacity: 0;
     }
+
+    .day-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 24px;
+      right: 24px;
+      height: 3px;
+      background: var(--accent);
+      border-radius: 0 0 3px 3px;
+      opacity: 0.7;
+      transition: opacity var(--transition);
+    }
+
     .day-card:hover {
-      transform: translateY(-6px) scale(1.02);
-      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+      border-color: var(--border-hover);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
     }
+
+    .day-card:hover::before {
+      opacity: 1;
+    }
+
     .day-card h2 {
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: var(--primary-color);
-      margin-top: 0;
-    }
-    .day-card h3 {
-      margin-top: 1rem;
-      margin-bottom: 0.5rem;
       font-size: 1rem;
       font-weight: 600;
-      border-bottom: 1px solid var(--border-color);
-      padding-bottom: 0.5rem;
+      color: var(--text);
+      margin: 4px 0 12px;
+      line-height: 1.4;
     }
-    .day-card ul {
-      padding-left: 20px;
-      list-style-type: '✓ ';
-      color: var(--subtle-text-color);
-    }
-    .day-card ul li { margin-bottom: 0.5rem; }
-    .day-card strong {
-      display: block;
-      margin-top: 1rem;
+
+    .day-card .day-label {
+      font-size: 12px;
       font-weight: 600;
-    }
-    .day-card p {
-      margin-top: 0.25rem;
-      color: var(--subtle-text-color);
-    }
-
-    #loading {
-      display: none;
-      text-align: center;
-      font-size: 18px;
-      color: var(--subtle-text-color);
-      padding: 40px;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
     }
 
-    /* Lightbox Modal */
-    #lightbox-overlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.7);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-      padding: 20px;
-      box-sizing: border-box;
+    .day-card h3 {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin: 16px 0 8px;
     }
-    #lightbox-content {
-      background: rgb(255 255 255);
-      padding: 2rem;
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-      max-width: 600px;
-      width: 100%;
+
+    .day-card ul {
+      padding-left: 0;
+      list-style: none;
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    .day-card ul li {
+      padding: 3px 0;
+      padding-left: 18px;
       position: relative;
-      max-height: 80vh;
-      overflow-y: auto;
-    }
-    .close-btn {
-      position: absolute;
-      top: 10px;
-      right: 20px;
-      font-size: 2.5rem;
-      color: #aaa;
-      cursor: pointer;
-      line-height: 1;
-      transition: color 0.2s;
     }
 
-    /* --- MODIFIED LOADING STYLE --- */
+    .day-card ul li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 11px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent-light);
+      border: 1.5px solid var(--accent);
+    }
+
+    .day-card .exercise-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 16px;
+      display: block;
+    }
+
+    .day-card p {
+      margin-top: 4px;
+      color: var(--text-secondary);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    @keyframes cardFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ========================================
+       LOADING OVERLAY
+       ======================================== */
     #loading {
-      display: none; /* Initially hidden, JS will toggle */
-      position: fixed; /* Full-screen overlay */
+      display: none;
+      position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      /* Use flex to center the loader */
       align-items: center;
       justify-content: center;
-      background: rgba(244, 246, 249, 0.9); /* Use background color with opacity */
-      z-index: 2000; /* Ensure it's on top of other content */
-      
-      /* Re-activate text styles */
-      font-size: 1.1rem;
-      font-weight: 500;
-      color: var(--subtle-text-color);
-
-      padding: 20px; 
-      box-sizing: border-box;
+      background: rgba(250, 251, 249, 0.92);
+      backdrop-filter: blur(6px);
+      z-index: 2000;
     }
 
     .loader-content {
@@ -273,232 +382,425 @@
       align-items: center;
       justify-content: center;
       height: 100vh;
-      gap: 1rem; /* Space between loader and text */
+      gap: 20px;
     }
-    
+
     .loader-content p {
       margin: 0;
       text-align: center;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text-secondary);
     }
 
-    /* --- NEW LOADER CSS --- */
+    /* Pulsing dots loader */
     .loader {
-      width: 45px;
-      height: 90px;
-      position: relative;
+      display: flex;
+      gap: 8px;
     }
-    .loader:after {
-      content: "";
-      position: absolute;
-      inset: 0 0 20px;
-      border-radius: 15px 15px 10px 10px;
-      padding: 1px;
-      background: repeating-linear-gradient(-45deg, #91d2e2 0 8px, #1296a7 0 12px)
-        content-box;
-      --c: radial-gradient(farthest-side, #000 94%, #0000);
-      -webkit-mask:
-        linear-gradient(#0000 0 0),
-        var(--c) -10px -10px,
-        var(--c) 15px -14px,
-        var(--c) 9px -6px,
-        var(--c) -12px 9px,
-        var(--c) 14px 9px,
-        var(--c) 23px 27px,
-        var(--c) -8px 35px,
-        var(--c) 50% 50%,
-        linear-gradient(#000 0 0);
-      mask:
-        linear-gradient(#000 0 0),
-        var(--c) -10px -10px,
-        var(--c) 15px -14px,
-        var(--c) 9px -6px,
-        var(--c) -12px 9px,
-        var(--c) 14px 9px,
-        var(--c) 23px 27px,
-        var(--c) -8px 35px,
-        var(--c) 50% 50%,
-        linear-gradient(#0000 0 0);
-      -webkit-mask-composite: destination-out;
-      mask-composite: exclude, add, add, add, add, add, add, add, add;
-      -webkit-mask-repeat: no-repeat;
-      animation: l2 3s infinite ease-out;
+
+    .loader span {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 1.4s ease-in-out infinite;
     }
-    .loader:before {
-      content: "";
-      position: absolute;
-      inset: 50% calc(50% - 4px) 0;
-      background: #e0a267;
-      border-radius: 50px;
+
+    .loader span:nth-child(2) {
+      animation-delay: 0.2s;
     }
-    @keyframes l2 {
-      0% {
-        -webkit-mask-size:
-          auto,
-          0 0,
-          0 0,
-          0 0,
-          0 0,
-          0 0,
-          0 0,
-          0 0,
-          0 0;
-      }
-      10% {
-        -webkit-mask-size:
-          auto,
-          25px 25px,
-          0 0,
-          0 0,
-          0 0,
-          0 0,
-          0 0,
-          0 0,
-          0 0;
-      }
-      20% {
-        -webkit-mask-size:
-          auto,
-          25px 25px,
-          25px 25px,
-          0 0,
-          0 0,
-          0 0,
-          0 0,
-          0 0,
-          0 0;
-      }
-      30% {
-        -webkit-mask-size:
-          auto,
-          25px 25px,
-          25px 25px,
-          30px 30px,
-          0 0,
-          0 0,
-          0 0,
-          0 0,
-          0 0;
-      }
-      40% {
-        -webkit-mask-size:
-          auto,
-          25px 25px,
-          25px 25px,
-          30px 30px,
-          30px 30px,
-          0 0,
-          0 0,
-          0 0,
-          0 0;
-      }
-      50% {
-        -webkit-mask-size:
-          auto,
-          25px 25px,
-          25px 25px,
-          30px 30px,
-          30px 30px,
-          25px 25px,
-          0 0,
-          0 0,
-          0 0;
-      }
-      60% {
-        -webkit-mask-size:
-          auto,
-          25px 25px,
-          25px 25px,
-          30px 30px,
-          30px 30px,
-          25px 25px,
-          25px 25px,
-          0 0,
-          0 0;
-      }
-      70% {
-        -webkit-mask-size:
-          auto,
-          25px 25px,
-          25px 25px,
-          30px 30px,
-          30px 30px,
-          25px 25px,
-          25px 25px,
-          25px 25px,
-          0 0;
-      }
+
+    .loader span:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes pulse {
+
+      0%,
       80%,
       100% {
-        -webkit-mask-size:
-          auto,
-          25px 25px,
-          25px 25px,
-          30px 30px,
-          30px 30px,
-          25px 25px,
-          25px 25px,
-          25px 25px,
-          200% 200%;
+        opacity: 0.25;
+        transform: scale(0.8);
+      }
+
+      40% {
+        opacity: 1;
+        transform: scale(1);
       }
     }
 
-
-    /* Lightbox Modal */
+    /* ========================================
+       LIGHTBOX MODAL
+       ======================================== */
     #lightbox-overlay {
       position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.7);
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(4px);
       display: none;
       justify-content: center;
       align-items: center;
       z-index: 1000;
-      padding: 20px;
+      padding: 24px;
       box-sizing: border-box;
     }
+
     #lightbox-content {
-      background: rgb(255 255 255);
-      padding: 2rem;
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      background: var(--surface);
+      padding: 32px;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
       max-width: 600px;
       width: 100%;
       position: relative;
-      max-height: 80vh;
+      max-height: 85vh;
       overflow-y: auto;
+      animation: modalIn 0.25s ease;
     }
+
+    #lightbox-content::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    #lightbox-content::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    #lightbox-content::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 3px;
+    }
+
+    @keyframes modalIn {
+      from {
+        opacity: 0;
+        transform: translateY(16px) scale(0.97);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
     .close-btn {
       position: absolute;
-      top: 10px;
+      top: 16px;
       right: 20px;
-      font-size: 2.5rem;
-      color: #aaa;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      color: var(--text-tertiary);
       cursor: pointer;
       line-height: 1;
-      transition: color 0.2s;
+      transition: all var(--transition);
+      border-radius: 50%;
+      background: transparent;
     }
-    .close-btn:hover { color: var(--text-color); }
-    
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+
+    .close-btn:hover {
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    /* Lightbox inner content */
+    #lightbox-body h2 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+      padding-right: 40px;
+      line-height: 1.4;
+    }
+
+    #lightbox-body .lightbox-day-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    #lightbox-body h3 {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    #lightbox-body ul {
+      padding-left: 0;
+      list-style: none;
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    #lightbox-body ul li {
+      padding: 4px 0;
+      padding-left: 18px;
+      position: relative;
+    }
+
+    #lightbox-body ul li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 12px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent-light);
+      border: 1.5px solid var(--accent);
+    }
+
+    #lightbox-body strong {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 20px;
+    }
+
+    #lightbox-body p {
+      margin-top: 6px;
+      color: var(--text-secondary);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* ========================================
+       VIDEO SECTION
+       ======================================== */
+    .video-section {
+      margin-top: 24px;
+      border-top: 1px solid var(--border);
+      padding-top: 20px;
+    }
+
+    .video-section h3 {
+      font-size: 12px !important;
+      color: var(--text-secondary) !important;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 14px !important;
+      margin-top: 0 !important;
+    }
+
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 12px;
+    }
+
+    .video-card {
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      transition: all var(--transition);
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      border: 1px solid var(--border);
+    }
+
+    .video-card:hover {
+      border-color: var(--border-hover);
+      box-shadow: var(--shadow-sm);
+      transform: translateY(-1px);
+    }
+
+    .video-card img {
+      width: 100%;
+      height: auto;
+      display: block;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+    }
+
+    .video-info {
+      padding: 10px;
+    }
+
+    .video-title {
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1.4;
+      margin-bottom: 4px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      color: var(--text);
+    }
+
+    .channel-title {
+      font-size: 11px;
+      color: var(--text-tertiary);
+    }
+
+    /* ========================================
+       SKELETON LOADER
+       ======================================== */
+    .skeleton-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 12px;
+    }
+
+    .skeleton-card {
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .skeleton-thumb {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: linear-gradient(to right, var(--border) 4%, #f5f5f5 25%, var(--border) 36%);
+      background-size: 1000px 100%;
+      animation: shimmer 1.5s infinite linear;
+    }
+
+    .skeleton-info {
+      padding: 10px;
+    }
+
+    .skeleton-text {
+      height: 10px;
+      background: linear-gradient(to right, var(--border) 4%, #f5f5f5 25%, var(--border) 36%);
+      background-size: 1000px 100%;
+      border-radius: 4px;
+      margin-bottom: 6px;
+      animation: shimmer 1.5s infinite linear;
+    }
+
+    .skeleton-text.short {
+      width: 60%;
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: -1000px 0;
+      }
+
+      100% {
+        background-position: 1000px 0;
+      }
+    }
+
+    /* ========================================
+       FOOTER
+       ======================================== */
+    .footer {
+      text-align: center;
+      padding: 32px 0 40px;
+      font-size: 12px;
+      color: var(--text-tertiary);
+      letter-spacing: 0.02em;
+    }
+
+    .footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    /* ========================================
+       ERROR STATE
+       ======================================== */
+    .error-message {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--accent);
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    /* ========================================
+       RESPONSIVE
+       ======================================== */
+    @media (max-width: 640px) {
+      .header {
+        padding: 32px 0 28px;
+      }
+
+      .header h1 {
+        font-size: 1.6rem;
+      }
+
+      .input-form {
+        padding: 24px;
+        margin-bottom: 32px;
+      }
+
+      #schedule-container {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .day-card {
+        padding: 20px;
+      }
+
+      #lightbox-content {
+        padding: 24px;
+        margin: 12px;
+      }
     }
   </style>
 </head>
+
 <body>
   <div class="container">
-    <h1>🧠 AI Learning <span>Scheduler</span></h1>
+    <!-- HEADER -->
+    <header class="header">
+      <h1>AI Learning <span>Scheduler</span></h1>
+      <p>Generate a personalized study plan, powered by AI</p>
+    </header>
 
-    <div class="action-buttons">
-      <button id="import-btn">Import</button>
+    <!-- ACTION BAR -->
+    <div class="action-bar">
+      <button id="import-btn" class="btn-ghost">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="17 8 12 3 7 8" />
+          <line x1="12" y1="3" x2="12" y2="15" />
+        </svg>
+        Import
+      </button>
       <input type="file" id="file-input" accept=".xml" style="display:none;">
-      <button id="export-btn">Download</button>
+      <button id="export-btn" class="btn-ghost">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="7 10 12 15 17 10" />
+          <line x1="12" y1="15" x2="12" y2="3" />
+        </svg>
+        Download
+      </button>
     </div>
 
+    <!-- FORM -->
     <form id="schedule-form" class="input-form">
       <div class="input-group">
         <label for="topic">What do you want to learn?</label>
-        <input type="text" id="topic" name="topic" placeholder="e.g., Python" required>
+        <input type="text" id="topic" name="topic" placeholder="e.g., Python, Machine Learning, Guitar…" required>
       </div>
 
       <div class="input-group">
@@ -513,22 +815,37 @@
           </select>
         </div>
       </div>
+
       <div class="input-group">
         <label for="commitment">How many hours per day?</label>
         <input type="text" id="commitment" name="commitment" placeholder="e.g., 2 hours" required>
       </div>
-      <button type="submit">Generate Schedule</button>
+
+      <button type="submit" class="btn-primary">Generate Schedule</button>
     </form>
 
+    <!-- LOADING -->
     <div id="loading">
       <div class="loader-content">
-        <div class="loader"></div>
-        <p>Generating your plan... Please wait.</p>
+        <div class="loader">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <p>Generating your plan…</p>
       </div>
     </div>
+
+    <!-- SCHEDULE GRID -->
     <div id="schedule-container"></div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      AI Learning Scheduler &middot; Powered by Gemini
+    </footer>
   </div>
 
+  <!-- LIGHTBOX MODAL -->
   <div id="lightbox-overlay">
     <div id="lightbox-content">
       <span class="close-btn">&times;</span>
@@ -547,23 +864,24 @@
     const importBtn = document.getElementById('import-btn');
     const exportBtn = document.getElementById('export-btn');
     const fileInput = document.getElementById('file-input');
-    
+
     let scheduleDataCache = null;
 
     async function handleScheduleGeneration(event) {
       event.preventDefault();
-      loadingIndicator.style.display = 'block';
-      container.innerHTML = ''; // Clear previous results
-      scheduleDataCache = []; // Reset the cache for a new schedule
+      loadingIndicator.style.display = 'flex';
+      container.innerHTML = '';
+      scheduleDataCache = [];
 
       let isFirstCard = true;
+      let cardIndex = 0;
 
       const durationValue = document.getElementById('duration-value').value;
       const durationUnit = document.getElementById('duration-unit').value;
-      
+
       const formData = {
         topic: document.getElementById('topic').value,
-        total_duration: `${durationValue} ${durationUnit}`, // e.g., "7 days"
+        total_duration: `${durationValue} ${durationUnit}`,
         daily_commitment: document.getElementById('commitment').value
       };
       try {
@@ -572,31 +890,30 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData)
         });
-        
+
         if (!response.ok) {
           throw new Error(`Network response was not ok (${response.status})`);
         }
 
-        // --- Streaming Response Logic ---
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
-        let buffer = ''; // Buffer to store partial chunks
+        let buffer = '';
 
         while (true) {
           const { done, value } = await reader.read();
-          if (done) break; // Stream finished
+          if (done) break;
 
           buffer += decoder.decode(value, { stream: true });
-          
+
           while (buffer.includes('\n')) {
             const newlineIndex = buffer.indexOf('\n');
             const line = buffer.substring(0, newlineIndex).trim();
-            buffer = buffer.substring(newlineIndex + 1); // Keep the remainder
+            buffer = buffer.substring(newlineIndex + 1);
 
             if (line) {
               try {
                 const dayData = JSON.parse(line);
-                
+
                 if (dayData.error) {
                   throw new Error(dayData.error);
                 }
@@ -604,20 +921,20 @@
                   loadingIndicator.style.display = 'none';
                   isFirstCard = false;
                 }
-                
+
                 scheduleDataCache.push(dayData);
-                appendDayCard(dayData, scheduleDataCache.length - 1);
-                
+                appendDayCard(dayData, scheduleDataCache.length - 1, cardIndex);
+                cardIndex++;
+
               } catch (e) {
                 console.error('Failed to parse JSON line:', line, e);
               }
             }
           }
         }
-        // --- End of streaming logic ---
 
       } catch (error) {
-        container.innerHTML = `<p style="color: red; text-align: center;">Error: Could not generate schedule. ${error.message}</p>`;
+        container.innerHTML = `<p class="error-message">Could not generate schedule. ${error.message}</p>`;
         console.error('Fetch error:', error);
       } finally {
         loadingIndicator.style.display = 'none';
@@ -626,23 +943,26 @@
 
     // --- 3. UI Helper Functions ---
 
-    function appendDayCard(day, index) {
-      const exerciseSummary = day.exercise.length > 100 ? day.exercise.substring(0, 100) + '...' : day.exercise;
-      
-      const periodText = String(day.day).toLowerCase().includes('month') 
-        ? day.day 
+    function appendDayCard(day, index, cardIndex) {
+      const exerciseSummary = day.exercise.length > 100 ? day.exercise.substring(0, 100) + '…' : day.exercise;
+
+      const periodText = String(day.day).toLowerCase().includes('month')
+        ? day.day
         : `Day ${day.day}`;
-      
-      const cardHTML = `
-        <div class="day-card" onclick="openLightbox(${index})">
-          <h2>${periodText}: ${day.topic_of_the_day}</h2>
-          <h3>Tasks:</h3>
-          <ul>${day.tasks.slice(0, 2).map(task => `<li>${task}</li>`).join('')} ${day.tasks.length > 2 ? '<li>...</li>' : ''}</ul>
-          <strong>Exercise:</strong>
-          <p>${exerciseSummary}</p>
-        </div>
+
+      const card = document.createElement('div');
+      card.className = 'day-card';
+      card.style.animationDelay = `${(cardIndex || 0) * 0.06}s`;
+      card.onclick = () => openLightbox(index);
+      card.innerHTML = `
+        <div class="day-label">${periodText}</div>
+        <h2>${day.topic_of_the_day}</h2>
+        <h3>Tasks</h3>
+        <ul>${day.tasks.slice(0, 2).map(task => `<li>${task}</li>`).join('')} ${day.tasks.length > 2 ? '<li>…</li>' : ''}</ul>
+        <span class="exercise-label">Exercise</span>
+        <p>${exerciseSummary}</p>
       `;
-      container.insertAdjacentHTML('beforeend', cardHTML);
+      container.appendChild(card);
     }
 
     function displaySchedule(scheduleData) {
@@ -650,49 +970,91 @@
         container.innerHTML = '';
         return;
       }
-      
-      let scheduleHTML = '';
+
+      container.innerHTML = '';
       scheduleData.forEach((day, index) => {
-        const exerciseSummary = day.exercise.length > 100 ? day.exercise.substring(0, 100) + '...' : day.exercise;
-        const periodText = String(day.day).toLowerCase().includes('month') 
-          ? day.day 
-          : `Day ${day.day}`;
-          
-        scheduleHTML += `
-          <div class="day-card" onclick="openLightbox(${index})">
-            <h2>${periodText}: ${day.topic_of_the_day}</h2>
-            <h3>Tasks:</h3>
-            <ul>${day.tasks.slice(0, 2).map(task => `<li>${task}</li>`).join('')} ${day.tasks.length > 2 ? '<li>...</li>' : ''}</ul>
-            <strong>Exercise:</strong>
-            <p>${exerciseSummary}</p>
-          </div>
-        `;
+        appendDayCard(day, index, index);
       });
-      container.innerHTML = scheduleHTML;
     }
 
     // --- 4. Lightbox (Modal) Logic ---
 
     function openLightbox(index) {
       if (!scheduleDataCache || !scheduleDataCache[index]) return;
-      
+
       document.body.classList.add('no-scroll');
       const day = scheduleDataCache[index];
-      
-      const periodText = String(day.day).toLowerCase().includes('month') 
-        ? day.day 
+
+      const periodText = String(day.day).toLowerCase().includes('month')
+        ? day.day
         : `Day ${day.day}`;
 
       let lightboxHTML = `
-        <h2>${periodText}: ${day.topic_of_the_day}</h2>
-        <h3>Tasks:</h3>
+        <span class="lightbox-day-label">${periodText}</span>
+        <h2>${day.topic_of_the_day}</h2>
+        <h3>Tasks</h3>
         <ul>${day.tasks.map(task => `<li>${task}</li>`).join('')}</ul>
-        <strong>Exercise:</strong>
+        <strong>Exercise</strong>
         <p>${day.exercise}</p>
+        
+        <div class="video-section">
+            <h3>Recommended Videos</h3>
+            <div id="video-container">
+                <div class="skeleton-grid">
+                    ${Array(4).fill(0).map(() => `
+                        <div class="skeleton-card">
+                            <div class="skeleton-thumb"></div>
+                            <div class="skeleton-info">
+                                <div class="skeleton-text"></div>
+                                <div class="skeleton-text short"></div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        </div>
       `;
-      
+
       lightboxBody.innerHTML = lightboxHTML;
       lightboxOverlay.style.display = 'flex';
+
+      // Fetch videos
+      const dayTopic = day.topic_of_the_day;
+      const mainTopic = document.getElementById('topic').value.trim();
+      const combinedQuery = mainTopic ? `${mainTopic} ${dayTopic}` : dayTopic;
+
+      fetch(`/get-videos?topic=${encodeURIComponent(combinedQuery)}`)
+        .then(response => {
+          if (!response.ok) throw new Error('Failed to load videos');
+          return response.json();
+        })
+        .then(videos => {
+          const videoContainer = document.getElementById('video-container');
+          if (videos.length === 0) {
+            videoContainer.innerHTML = '<p>No videos found.</p>';
+            return;
+          }
+
+          const videoHTML = `
+                <div class="video-grid">
+                    ${videos.map(video => `
+                        <a href="https://www.youtube.com/watch?v=${video.videoId}" target="_blank" class="video-card">
+                            <img src="${video.thumbnail}" alt="${video.title}">
+                            <div class="video-info">
+                                <div class="video-title" title="${video.title}">${video.title}</div>
+                                <div class="channel-title">${video.channelTitle}</div>
+                            </div>
+                        </a>
+                    `).join('')}
+                </div>
+            `;
+          videoContainer.innerHTML = videoHTML;
+        })
+        .catch(error => {
+          console.error(error);
+          const videoContainer = document.getElementById('video-container');
+          videoContainer.innerHTML = '<p style="color:var(--text-tertiary); font-size: 13px;">Could not load videos.</p>';
+        });
     }
 
     function closeLightbox() {
@@ -707,13 +1069,13 @@
         alert('Please generate a schedule first.');
         return;
       }
-      
-      const escapeXML = (str) => String(str).replace(/[<>&'"]/g, c => 
-        ({'<':'&lt;','>':'&gt;','&':'&amp;','\'':'&apos;','"':'&quot;'}[c])
+
+      const escapeXML = (str) => String(str).replace(/[<>&'"]/g, c =>
+        ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '\'': '&apos;', '"': '&quot;' }[c])
       );
-      
+
       let xmlString = '<?xml version="1.0" encoding="UTF-8"?>\n<schedule>\n';
-      
+
       scheduleDataCache.forEach(day => {
         xmlString += `  <day id="${day.day}">\n`;
         xmlString += `    <topic>${escapeXML(day.topic_of_the_day)}</topic>\n`;
@@ -723,9 +1085,9 @@
         xmlString += `    <exercise>${escapeXML(day.exercise)}</exercise>\n`;
         xmlString += `  </day>\n`;
       });
-      
+
       xmlString += '</schedule>';
-      
+
       const blob = new Blob([xmlString], { type: 'application/xml' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -740,20 +1102,20 @@
     function handleFileImport(event) {
       const file = event.target.files[0];
       if (!file) return;
-      
+
       const reader = new FileReader();
       reader.onload = (e) => {
         try {
           const parser = new DOMParser();
           const xmlDoc = parser.parseFromString(e.target.result, "application/xml");
-          
+
           if (xmlDoc.getElementsByTagName("parsererror").length) {
             throw new Error("Failed to parse XML. File may be corrupt.");
           }
-          
+
           const importedData = [];
           const dayNodes = xmlDoc.getElementsByTagName("day");
-          
+
           for (const dayNode of dayNodes) {
             const dayData = {
               day: dayNode.getAttribute("id"),
@@ -763,36 +1125,37 @@
             };
             importedData.push(dayData);
           }
-          
+
           scheduleDataCache = importedData;
           displaySchedule(scheduleDataCache);
-          
+
         } catch (error) {
           alert('Error importing file. Please ensure it is a valid schedule XML file.');
           console.error("XML Import Error:", error);
         }
       };
-      
+
       reader.readAsText(file);
       fileInput.value = '';
     }
 
     // --- 6. Event Listeners ---
-    
+
     form.addEventListener('submit', handleScheduleGeneration);
-    
+
     closeBtn.addEventListener('click', closeLightbox);
-    lightboxOverlay.addEventListener('click', (event) => { 
-      if (event.target === lightboxOverlay) closeLightbox(); 
+    lightboxOverlay.addEventListener('click', (event) => {
+      if (event.target === lightboxOverlay) closeLightbox();
     });
-    document.addEventListener('keydown', (event) => { 
-      if (event.key === 'Escape') closeLightbox(); 
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') closeLightbox();
     });
-    
+
     importBtn.addEventListener('click', () => fileInput.click());
     exportBtn.addEventListener('click', exportToXML);
     fileInput.addEventListener('change', handleFileImport);
-    
+
   </script>
 </body>
+
 </html>
