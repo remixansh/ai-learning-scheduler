@@ -1093,6 +1093,66 @@
     }
 
     /* ========================================
+       PROGRESS — VIDEO LINKS (minimalist)
+       ======================================== */
+    .progress-videos-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 8px;
+      padding: 0;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--accent);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      opacity: 0.8;
+      transition: opacity var(--transition);
+    }
+
+    .progress-videos-toggle:hover {
+      opacity: 1;
+    }
+
+    .progress-videos-toggle svg {
+      width: 14px;
+      height: 14px;
+      stroke-width: 2;
+    }
+
+    .progress-video-list {
+      margin-top: 8px;
+      padding-left: 4px;
+    }
+
+    .progress-video-link {
+      display: block;
+      padding: 5px 0;
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color var(--transition);
+      line-height: 1.4;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .progress-video-link:last-child {
+      border-bottom: none;
+    }
+
+    .progress-video-link:hover {
+      color: var(--accent);
+    }
+
+    .progress-video-loading {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      padding: 6px 0;
+    }
+
+    /* ========================================
        TOAST NOTIFICATION
        ======================================== */
     .toast {
@@ -2292,7 +2352,11 @@
           daysHTML += '<div class="progress-day">' +
             '<div class="progress-day-header">' + periodText + '</div>' +
             '<div class="progress-day-topic">' + day.topic_of_the_day + '</div>' +
-            tasksHTML + exHTML + '</div>';
+            tasksHTML + exHTML +
+            '<button class="progress-videos-toggle" onclick="event.stopPropagation(); loadProgressVideos(this, \'' + routine.topic.replace(/'/g, '') + '\', \'' + day.topic_of_the_day.replace(/'/g, '') + '\')">' +
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>' +
+            'Videos</button>' +
+            '</div>';
         });
 
         html += '<div class="routine-card" id="routine-' + routine.id + '" style="animation-delay:' + (rIdx * 0.06) + 's">' +
@@ -2351,6 +2415,39 @@
 
     // Initialize progress tab
     renderRoutines();
+
+    // --- 11. Progress Video Links ---
+
+    function loadProgressVideos(btn, mainTopic, dayTopic) {
+      const parent = btn.parentElement;
+      // Toggle off if already loaded
+      const existing = parent.querySelector('.progress-video-list');
+      if (existing) {
+        existing.remove();
+        return;
+      }
+
+      const container = document.createElement('div');
+      container.className = 'progress-video-list';
+      container.innerHTML = '<div class="progress-video-loading">Loading...</div>';
+      parent.appendChild(container);
+
+      const query = mainTopic + ' ' + dayTopic;
+      fetch('/get-videos?topic=' + encodeURIComponent(query))
+        .then(r => r.json())
+        .then(videos => {
+          if (!videos || videos.length === 0) {
+            container.innerHTML = '<div class="progress-video-loading">No videos found</div>';
+            return;
+          }
+          container.innerHTML = videos.map(v =>
+            '<a class="progress-video-link" href="https://www.youtube.com/watch?v=' + v.videoId + '" target="_blank">' + v.title + '</a>'
+          ).join('');
+        })
+        .catch(() => {
+          container.innerHTML = '<div class="progress-video-loading">Could not load videos</div>';
+        });
+    }
 
     // --- 11. Pomodoro Timer ---
 
