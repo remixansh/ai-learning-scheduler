@@ -734,15 +734,409 @@
     }
 
     /* ========================================
+       NAVIGATION TABS
+       ======================================== */
+    .nav-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      margin-bottom: 32px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 4px;
+      max-width: 280px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .nav-tab {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 9px 20px;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: inherit;
+      color: var(--text-secondary);
+      background: transparent;
+      border: none;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+
+    .nav-tab:hover {
+      color: var(--text);
+    }
+
+    .nav-tab.active {
+      background: var(--accent);
+      color: #FFFFFF;
+      box-shadow: 0 2px 8px rgba(232, 104, 74, 0.25);
+    }
+
+    .nav-tab svg {
+      width: 16px;
+      height: 16px;
+      stroke-width: 2;
+    }
+
+    /* Tab content */
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* ========================================
+       SAVE ROUTINE BUTTON
+       ======================================== */
+    .save-routine-bar {
+      display: none;
+      justify-content: center;
+      margin-bottom: 20px;
+      animation: cardFadeIn 0.3s ease;
+    }
+
+    .save-routine-bar.visible {
+      display: flex;
+    }
+
+    .btn-save-routine {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: inherit;
+      color: var(--accent);
+      background: var(--accent-light);
+      border: 1.5px solid var(--accent);
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+
+    .btn-save-routine:hover {
+      background: var(--accent);
+      color: #FFFFFF;
+      box-shadow: 0 4px 14px rgba(232, 104, 74, 0.25);
+    }
+
+    .btn-save-routine svg {
+      width: 18px;
+      height: 18px;
+      stroke-width: 2;
+    }
+
+    /* ========================================
+       PROGRESS TAB
+       ======================================== */
+    .progress-view {
+      max-width: 700px;
+      margin: 0 auto;
+      padding-bottom: 100px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 80px 20px;
+    }
+
+    .empty-state svg {
+      width: 56px;
+      height: 56px;
+      color: var(--border);
+      margin-bottom: 16px;
+    }
+
+    .empty-state h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .empty-state p {
+      font-size: 14px;
+      color: var(--text-tertiary);
+    }
+
+    /* Routine Card */
+    .routine-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      margin-bottom: 12px;
+      overflow: hidden;
+      transition: all var(--transition);
+      animation: cardFadeIn 0.4s ease forwards;
+      opacity: 0;
+    }
+
+    .routine-header {
+      display: flex;
+      align-items: center;
+      padding: 16px 20px;
+      cursor: pointer;
+      gap: 14px;
+      transition: background var(--transition);
+    }
+
+    .routine-header:hover {
+      background: var(--bg);
+    }
+
+    .routine-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--accent-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 18px;
+    }
+
+    .routine-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .routine-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .routine-meta {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      margin-top: 2px;
+    }
+
+    .routine-progress-ring {
+      flex-shrink: 0;
+      position: relative;
+      width: 40px;
+      height: 40px;
+    }
+
+    .routine-progress-ring svg {
+      transform: rotate(-90deg);
+    }
+
+    .routine-progress-ring .ring-bg {
+      stroke: var(--border);
+    }
+
+    .routine-progress-ring .ring-fill {
+      stroke: var(--accent);
+      transition: stroke-dashoffset 0.4s ease;
+    }
+
+    .routine-pct {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .routine-chevron {
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      color: var(--text-tertiary);
+      transition: transform 0.25s ease;
+    }
+
+    .routine-card.expanded .routine-chevron {
+      transform: rotate(180deg);
+    }
+
+    .routine-delete {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: transparent;
+      color: var(--text-tertiary);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+
+    .routine-delete:hover {
+      background: #FDEEE9;
+      color: var(--accent);
+    }
+
+    .routine-delete svg {
+      width: 16px;
+      height: 16px;
+      stroke-width: 2;
+    }
+
+    /* Routine body (accordion) */
+    .routine-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease;
+    }
+
+    .routine-card.expanded .routine-body {
+      max-height: 5000px;
+    }
+
+    .routine-body-inner {
+      padding: 0 20px 20px;
+    }
+
+    /* Day section inside routine */
+    .progress-day {
+      padding: 14px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .progress-day-header {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 10px;
+    }
+
+    .progress-day-topic {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    /* Custom Checkbox */
+    .check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 6px 0;
+      cursor: pointer;
+    }
+
+    .check-item input[type="checkbox"] {
+      display: none;
+    }
+
+    .check-box {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      border: 2px solid var(--border);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition);
+      margin-top: 1px;
+    }
+
+    .check-box svg {
+      width: 12px;
+      height: 12px;
+      opacity: 0;
+      transform: scale(0.5);
+      transition: all 0.15s ease;
+      color: #FFFFFF;
+      stroke-width: 3;
+    }
+
+    .check-item input:checked+.check-box {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .check-item input:checked+.check-box svg {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .check-item input:checked~.check-label {
+      color: var(--text-tertiary);
+      text-decoration: line-through;
+    }
+
+    .check-label {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      transition: all var(--transition);
+    }
+
+    .check-label.exercise-check {
+      font-style: italic;
+    }
+
+    /* ========================================
+       TOAST NOTIFICATION
+       ======================================== */
+    .toast {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--text);
+      color: #FFFFFF;
+      padding: 12px 24px;
+      border-radius: 100px;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: inherit;
+      box-shadow: var(--shadow-lg);
+      z-index: 3000;
+      opacity: 0;
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ========================================
        RESPONSIVE
        ======================================== */
     @media (max-width: 640px) {
       .header {
-        padding: 32px 0 28px;
+        padding: 32px 0 20px;
       }
 
       .header h1 {
         font-size: 1.6rem;
+      }
+
+      .nav-tabs {
+        display: none;
+      }
+
+      .mobile-nav {
+        display: flex;
       }
 
       .input-form {
@@ -753,6 +1147,7 @@
       #schedule-container {
         grid-template-columns: 1fr;
         gap: 12px;
+        padding-bottom: 100px;
       }
 
       .day-card {
@@ -763,6 +1158,66 @@
         padding: 24px;
         margin: 12px;
       }
+
+      .progress-view {
+        padding-bottom: 120px;
+      }
+
+      .toast {
+        bottom: 90px;
+      }
+
+      .footer {
+        padding-bottom: 80px;
+      }
+    }
+
+    /* Mobile bottom nav */
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 8px 0;
+      padding-bottom: max(8px, env(safe-area-inset-bottom));
+      z-index: 900;
+    }
+
+    .mobile-nav-inner {
+      display: flex;
+      justify-content: space-around;
+      max-width: 300px;
+      margin: 0 auto;
+    }
+
+    .mobile-nav-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      padding: 6px 16px;
+      font-size: 11px;
+      font-weight: 500;
+      font-family: inherit;
+      color: var(--text-tertiary);
+      background: transparent;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+
+    .mobile-nav-btn.active {
+      color: var(--accent);
+    }
+
+    .mobile-nav-btn svg {
+      width: 22px;
+      height: 22px;
+      stroke-width: 1.8;
     }
   </style>
 </head>
@@ -775,75 +1230,138 @@
       <p>Generate a personalized study plan, powered by AI</p>
     </header>
 
-    <!-- ACTION BAR -->
-    <div class="action-bar">
-      <button id="import-btn" class="btn-ghost">
+    <!-- NAV TABS (desktop) -->
+    <nav class="nav-tabs" id="desktop-nav">
+      <button class="nav-tab active" data-tab="schedule" onclick="switchTab('schedule')">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-          <polyline points="17 8 12 3 7 8" />
-          <line x1="12" y1="3" x2="12" y2="15" />
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+          <line x1="16" y1="2" x2="16" y2="6" />
+          <line x1="8" y1="2" x2="8" y2="6" />
+          <line x1="3" y1="10" x2="21" y2="10" />
         </svg>
-        Import
+        Schedule
       </button>
-      <input type="file" id="file-input" accept=".xml" style="display:none;">
-      <button id="export-btn" class="btn-ghost">
+      <button class="nav-tab" data-tab="progress" onclick="switchTab('progress')">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-          <polyline points="7 10 12 15 17 10" />
-          <line x1="12" y1="15" x2="12" y2="3" />
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
         </svg>
-        Download
+        Progress
       </button>
-    </div>
+    </nav>
 
-    <!-- FORM -->
-    <form id="schedule-form" class="input-form">
-      <div class="input-group">
-        <label for="topic">What do you want to learn?</label>
-        <input type="text" id="topic" name="topic" placeholder="e.g., Python, Machine Learning, Guitar…" required>
+    <!-- ===== SCHEDULE TAB ===== -->
+    <div class="tab-content active" id="tab-schedule">
+
+      <!-- ACTION BAR -->
+      <div class="action-bar">
+        <button id="import-btn" class="btn-ghost">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="17 8 12 3 7 8" />
+            <line x1="12" y1="3" x2="12" y2="15" />
+          </svg>
+          Import
+        </button>
+        <input type="file" id="file-input" accept=".xml" style="display:none;">
+        <button id="export-btn" class="btn-ghost">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          Download
+        </button>
       </div>
 
-      <div class="input-group">
-        <label for="duration-value">How much time to finish?</label>
-        <div class="duration-input-container">
-          <input type="number" id="duration-value" name="duration-value" placeholder="e.g., 7" min="1" required>
-          <select id="duration-unit" name="duration-unit">
-            <option value="days" selected>Days</option>
-            <option value="weeks">Weeks</option>
-            <option value="months">Months</option>
-            <option value="years">Years</option>
-          </select>
+      <!-- FORM -->
+      <form id="schedule-form" class="input-form">
+        <div class="input-group">
+          <label for="topic">What do you want to learn?</label>
+          <input type="text" id="topic" name="topic" placeholder="e.g., Python, Machine Learning, Guitar…" required>
+        </div>
+
+        <div class="input-group">
+          <label for="duration-value">How much time to finish?</label>
+          <div class="duration-input-container">
+            <input type="number" id="duration-value" name="duration-value" placeholder="e.g., 7" min="1" required>
+            <select id="duration-unit" name="duration-unit">
+              <option value="days" selected>Days</option>
+              <option value="weeks">Weeks</option>
+              <option value="months">Months</option>
+              <option value="years">Years</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="commitment">How many hours per day?</label>
+          <input type="text" id="commitment" name="commitment" placeholder="e.g., 2 hours" required>
+        </div>
+
+        <button type="submit" class="btn-primary">Generate Schedule</button>
+      </form>
+
+      <!-- LOADING -->
+      <div id="loading">
+        <div class="loader-content">
+          <div class="loader">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <p>Generating your plan…</p>
         </div>
       </div>
 
-      <div class="input-group">
-        <label for="commitment">How many hours per day?</label>
-        <input type="text" id="commitment" name="commitment" placeholder="e.g., 2 hours" required>
+      <!-- SAVE ROUTINE BUTTON -->
+      <div class="save-routine-bar" id="save-routine-bar">
+        <button class="btn-save-routine" onclick="saveRoutine()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+          </svg>
+          Mark as my routine
+        </button>
       </div>
 
-      <button type="submit" class="btn-primary">Generate Schedule</button>
-    </form>
+      <!-- SCHEDULE GRID -->
+      <div id="schedule-container"></div>
 
-    <!-- LOADING -->
-    <div id="loading">
-      <div class="loader-content">
-        <div class="loader">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-        <p>Generating your plan…</p>
-      </div>
+    </div><!-- /tab-schedule -->
+
+    <!-- ===== PROGRESS TAB ===== -->
+    <div class="tab-content" id="tab-progress">
+      <div class="progress-view" id="progress-view"></div>
     </div>
-
-    <!-- SCHEDULE GRID -->
-    <div id="schedule-container"></div>
 
     <!-- FOOTER -->
     <footer class="footer">
       AI Learning Scheduler &middot; Powered by Gemini
     </footer>
   </div>
+
+  <!-- MOBILE BOTTOM NAV -->
+  <nav class="mobile-nav" id="mobile-nav">
+    <div class="mobile-nav-inner">
+      <button class="mobile-nav-btn active" data-tab="schedule" onclick="switchTab('schedule')">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+          <line x1="16" y1="2" x2="16" y2="6" />
+          <line x1="8" y1="2" x2="8" y2="6" />
+          <line x1="3" y1="10" x2="21" y2="10" />
+        </svg>
+        Schedule
+      </button>
+      <button class="mobile-nav-btn" data-tab="progress" onclick="switchTab('progress')">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+        </svg>
+        Progress
+      </button>
+    </div>
+  </nav>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
 
   <!-- LIGHTBOX MODAL -->
   <div id="lightbox-overlay">
@@ -938,6 +1456,9 @@
         console.error('Fetch error:', error);
       } finally {
         loadingIndicator.style.display = 'none';
+        if (scheduleDataCache && scheduleDataCache.length > 0) {
+          document.getElementById('save-routine-bar').classList.add('visible');
+        }
       }
     }
 
@@ -1154,6 +1675,197 @@
     importBtn.addEventListener('click', () => fileInput.click());
     exportBtn.addEventListener('click', exportToXML);
     fileInput.addEventListener('change', handleFileImport);
+
+    // --- 7. Tab Navigation ---
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.getElementById('tab-' + tabName).classList.add('active');
+
+      document.querySelectorAll('.nav-tab').forEach(el => {
+        el.classList.toggle('active', el.dataset.tab === tabName);
+      });
+      document.querySelectorAll('.mobile-nav-btn').forEach(el => {
+        el.classList.toggle('active', el.dataset.tab === tabName);
+      });
+
+      if (tabName === 'progress') renderRoutines();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // --- 8. Toast ---
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    // --- 9. Routine Storage ---
+
+    const STORAGE_KEY = 'ai_scheduler_routines';
+
+    function getRoutines() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+      catch { return []; }
+    }
+
+    function setRoutines(routines) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(routines));
+    }
+
+    function saveRoutine() {
+      if (!scheduleDataCache || scheduleDataCache.length === 0) {
+        showToast('Generate a schedule first');
+        return;
+      }
+      const topic = document.getElementById('topic').value.trim() || 'Untitled';
+      const routines = getRoutines();
+      const routine = {
+        id: Date.now().toString(),
+        topic: topic,
+        savedAt: new Date().toISOString(),
+        schedule: scheduleDataCache,
+        progress: {}
+      };
+      scheduleDataCache.forEach((day, i) => {
+        routine.progress[i] = {
+          tasks: new Array(day.tasks.length).fill(false),
+          exercise: false
+        };
+      });
+      routines.unshift(routine);
+      setRoutines(routines);
+      document.getElementById('save-routine-bar').classList.remove('visible');
+      showToast('Routine saved!');
+      setTimeout(() => switchTab('progress'), 400);
+    }
+
+    function deleteRoutine(id) {
+      if (!confirm('Delete this routine?')) return;
+      const routines = getRoutines().filter(r => r.id !== id);
+      setRoutines(routines);
+      renderRoutines();
+      showToast('Routine deleted');
+    }
+
+    function getRoutineProgress(routine) {
+      let total = 0, done = 0;
+      for (const key in routine.progress) {
+        const p = routine.progress[key];
+        total += p.tasks.length + 1;
+        done += p.tasks.filter(Boolean).length + (p.exercise ? 1 : 0);
+      }
+      return total > 0 ? Math.round((done / total) * 100) : 0;
+    }
+
+    // --- 10. Render Progress Tab ---
+
+    const CIRC = 2 * Math.PI * 16;
+
+    function renderRoutines() {
+      const view = document.getElementById('progress-view');
+      const routines = getRoutines();
+
+      if (routines.length === 0) {
+        view.innerHTML = '<div class="empty-state">' +
+          '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>' +
+          '<h3>No routines yet</h3>' +
+          '<p>Generate a schedule and tap "Mark as my routine" to start tracking</p></div>';
+        return;
+      }
+
+      let html = '';
+      routines.forEach((routine, rIdx) => {
+        const pct = getRoutineProgress(routine);
+        const offset = CIRC - (pct / 100) * CIRC;
+        const date = new Date(routine.savedAt);
+        const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        const daysCount = routine.schedule.length;
+
+        let daysHTML = '';
+        routine.schedule.forEach((day, dIdx) => {
+          const periodText = String(day.day).toLowerCase().includes('month') ? day.day : 'Day ' + day.day;
+          const prog = routine.progress[dIdx] || { tasks: [], exercise: false };
+
+          let tasksHTML = '';
+          day.tasks.forEach((task, tIdx) => {
+            const chk = prog.tasks[tIdx] ? 'checked' : '';
+            tasksHTML += '<label class="check-item">' +
+              '<input type="checkbox" ' + chk + ' onchange="toggleCheck(\'' + routine.id + '\',' + dIdx + ',\'task\',' + tIdx + ')">' +
+              '<span class="check-box"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg></span>' +
+              '<span class="check-label">' + task + '</span></label>';
+          });
+
+          const exChk = prog.exercise ? 'checked' : '';
+          const exHTML = '<label class="check-item">' +
+            '<input type="checkbox" ' + exChk + ' onchange="toggleCheck(\'' + routine.id + '\',' + dIdx + ',\'exercise\',0)">' +
+            '<span class="check-box"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg></span>' +
+            '<span class="check-label exercise-check">' + day.exercise + '</span></label>';
+
+          daysHTML += '<div class="progress-day">' +
+            '<div class="progress-day-header">' + periodText + '</div>' +
+            '<div class="progress-day-topic">' + day.topic_of_the_day + '</div>' +
+            tasksHTML + exHTML + '</div>';
+        });
+
+        html += '<div class="routine-card" id="routine-' + routine.id + '" style="animation-delay:' + (rIdx * 0.06) + 's">' +
+          '<div class="routine-header" onclick="toggleRoutine(\'' + routine.id + '\')">' +
+          '<div class="routine-icon">\ud83d\udcda</div>' +
+          '<div class="routine-info">' +
+          '<div class="routine-title">' + routine.topic + '</div>' +
+          '<div class="routine-meta">' + daysCount + ' days \u00b7 Saved ' + dateStr + '</div>' +
+          '</div>' +
+          '<div class="routine-progress-ring">' +
+          '<svg width="40" height="40">' +
+          '<circle class="ring-bg" cx="20" cy="20" r="16" fill="none" stroke-width="3"/>' +
+          '<circle class="ring-fill" cx="20" cy="20" r="16" fill="none" stroke-width="3" stroke-dasharray="' + CIRC + '" stroke-dashoffset="' + offset + '" stroke-linecap="round"/>' +
+          '</svg>' +
+          '<span class="routine-pct">' + pct + '%</span>' +
+          '</div>' +
+          '<button class="routine-delete" onclick="event.stopPropagation(); deleteRoutine(\'' + routine.id + '\')">' +
+          '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>' +
+          '</button>' +
+          '<svg class="routine-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>' +
+          '</div>' +
+          '<div class="routine-body"><div class="routine-body-inner">' + daysHTML + '</div></div>' +
+          '</div>';
+      });
+
+      view.innerHTML = html;
+    }
+
+    function toggleRoutine(id) {
+      document.getElementById('routine-' + id).classList.toggle('expanded');
+    }
+
+    function toggleCheck(routineId, dayIdx, type, taskIdx) {
+      const routines = getRoutines();
+      const routine = routines.find(r => r.id === routineId);
+      if (!routine) return;
+
+      if (type === 'task') {
+        routine.progress[dayIdx].tasks[taskIdx] = !routine.progress[dayIdx].tasks[taskIdx];
+      } else {
+        routine.progress[dayIdx].exercise = !routine.progress[dayIdx].exercise;
+      }
+      setRoutines(routines);
+
+      // Optimistic progress ring update
+      const pct = getRoutineProgress(routine);
+      const offset = CIRC - (pct / 100) * CIRC;
+      const card = document.getElementById('routine-' + routineId);
+      if (card) {
+        const ring = card.querySelector('.ring-fill');
+        const pctLabel = card.querySelector('.routine-pct');
+        if (ring) ring.setAttribute('stroke-dashoffset', offset);
+        if (pctLabel) pctLabel.textContent = pct + '%';
+      }
+    }
+
+    // Initialize progress tab
+    renderRoutines();
 
   </script>
 </body>
