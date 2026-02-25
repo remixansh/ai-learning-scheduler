@@ -1093,6 +1093,369 @@
     }
 
     /* ========================================
+       MODE TOGGLE (Scheduler / To-Do)
+       ======================================== */
+    .mode-toggle-desktop {
+      position: fixed;
+      top: 20px;
+      left: 24px;
+      z-index: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 18px;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: inherit;
+      color: var(--text);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+
+    .mode-toggle-desktop:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .mode-toggle-desktop svg {
+      width: 16px;
+      height: 16px;
+      stroke-width: 2;
+    }
+
+    .mode-toggle-mobile {
+      display: none;
+      margin: 0 auto 20px;
+      padding: 7px 20px;
+      font-size: 12px;
+      font-weight: 500;
+      font-family: inherit;
+      color: var(--text);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all var(--transition);
+      align-items: center;
+      gap: 6px;
+    }
+
+    .mode-toggle-mobile svg {
+      width: 14px;
+      height: 14px;
+      stroke-width: 2;
+    }
+
+    @media (max-width: 640px) {
+      .mode-toggle-desktop {
+        display: none;
+      }
+
+      .mode-toggle-mobile {
+        display: inline-flex;
+      }
+    }
+
+    /* App views transition */
+    .app-view {
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+
+    .app-view.vanish {
+      opacity: 0;
+      transform: scale(0.97);
+      pointer-events: none;
+    }
+
+    /* ========================================
+       TO-DO VIEW
+       ======================================== */
+    .todo-wrapper {
+      display: none;
+      max-width: 560px;
+      margin: 0 auto;
+      padding-bottom: 120px;
+    }
+
+    .todo-wrapper.active {
+      display: block;
+    }
+
+    .todo-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .todo-header h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .todo-add-btn-desktop {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 18px;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: inherit;
+      color: #FFFFFF;
+      background: var(--accent);
+      border: none;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+
+    .todo-add-btn-desktop:hover {
+      background: var(--accent-hover);
+      box-shadow: 0 4px 14px rgba(232, 104, 74, 0.25);
+    }
+
+    .todo-add-btn-desktop svg {
+      width: 16px;
+      height: 16px;
+      stroke-width: 2.5;
+    }
+
+    @media (max-width: 640px) {
+      .todo-add-btn-desktop {
+        display: none;
+      }
+    }
+
+    /* Task item */
+    .todo-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      animation: cardFadeIn 0.3s ease forwards;
+      opacity: 0;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .todo-item.sinking {
+      opacity: 0.4;
+    }
+
+    .todo-item.checked-item {
+      opacity: 0.5;
+    }
+
+    /* Circular checkbox */
+    .todo-check {
+      width: 24px;
+      height: 24px;
+      flex-shrink: 0;
+      border: 2px solid var(--border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: transparent;
+      padding: 0;
+    }
+
+    .todo-check:hover {
+      border-color: var(--accent);
+    }
+
+    .todo-check svg {
+      width: 14px;
+      height: 14px;
+      opacity: 0;
+      transform: scale(0.5);
+      transition: all 0.15s ease;
+      color: #FFFFFF;
+      stroke-width: 3;
+    }
+
+    .todo-check.checked {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .todo-check.checked svg {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .todo-text {
+      flex: 1;
+      font-size: 15px;
+      color: var(--text);
+      line-height: 1.4;
+      transition: all var(--transition);
+    }
+
+    .todo-item.checked-item .todo-text,
+    .todo-item.sinking .todo-text {
+      text-decoration: line-through;
+      color: var(--text-tertiary);
+    }
+
+    .todo-delete {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: transparent;
+      color: var(--text-tertiary);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all var(--transition);
+      opacity: 0;
+      padding: 0;
+    }
+
+    .todo-item:hover .todo-delete {
+      opacity: 1;
+    }
+
+    @media (max-width: 640px) {
+      .todo-delete {
+        opacity: 0.5;
+      }
+    }
+
+    .todo-delete:hover {
+      color: var(--accent);
+      background: var(--accent-light);
+    }
+
+    .todo-delete svg {
+      width: 15px;
+      height: 15px;
+      stroke-width: 2;
+    }
+
+    /* Checked section label */
+    .todo-checked-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      padding: 20px 0 8px;
+    }
+
+    /* Empty state */
+    .todo-empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-tertiary);
+      font-size: 14px;
+    }
+
+    /* Mobile FAB for adding tasks */
+    .todo-fab {
+      display: none;
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #FFFFFF;
+      border: none;
+      box-shadow: 0 4px 16px rgba(232, 104, 74, 0.35);
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 850;
+      transition: transform 0.2s ease;
+    }
+
+    .todo-fab:active {
+      transform: scale(0.9);
+    }
+
+    .todo-fab svg {
+      width: 24px;
+      height: 24px;
+      stroke-width: 2.5;
+    }
+
+    @media (max-width: 640px) {
+      .todo-fab.visible {
+        display: flex;
+      }
+    }
+
+    /* Add task overlay */
+    .todo-input-overlay {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 20px 24px;
+      padding-bottom: max(20px, env(safe-area-inset-bottom));
+      z-index: 1000;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .todo-input-overlay.open {
+      transform: translateY(0);
+    }
+
+    .todo-input-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .todo-input-field {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      font-family: inherit;
+      color: var(--text);
+      background: var(--bg);
+      outline: none;
+      transition: border-color var(--transition);
+    }
+
+    .todo-input-field:focus {
+      border-color: var(--accent);
+    }
+
+    .todo-input-ok {
+      padding: 12px 20px;
+      background: var(--accent);
+      color: #FFFFFF;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background var(--transition);
+    }
+
+    .todo-input-ok:hover {
+      background: var(--accent-hover);
+    }
+
+    /* ========================================
        PROGRESS — VIDEO LINKS (minimalist)
        ======================================== */
     .progress-videos-toggle {
@@ -1698,205 +2061,260 @@
 
 <body>
   <div class="container">
-    <!-- HEADER -->
-    <header class="header">
-      <h1>AI Learning <span>Scheduler</span></h1>
-      <p>Generate a personalized study plan, powered by AI</p>
-    </header>
-
-    <!-- NAV TABS (desktop) -->
-    <nav class="nav-tabs" id="desktop-nav">
-      <button class="nav-tab active" data-tab="schedule" onclick="switchTab('schedule')">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-          <line x1="16" y1="2" x2="16" y2="6" />
-          <line x1="8" y1="2" x2="8" y2="6" />
-          <line x1="3" y1="10" x2="21" y2="10" />
-        </svg>
-        Schedule
-      </button>
-      <button class="nav-tab" data-tab="progress" onclick="switchTab('progress')">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-        </svg>
-        Progress
-      </button>
-    </nav>
-    <button class="desktop-timer-btn" onclick="openTimer()">
+    <!-- MODE TOGGLE -->
+    <button class="mode-toggle-desktop" id="mode-toggle-desktop" onclick="toggleAppMode()">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-        <circle cx="12" cy="12" r="10" />
-        <polyline points="12 6 12 12 16 14" />
+        <path d="M9 11l3 3L22 4" />
+        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
       </svg>
-      Pomodoro
+      To Do
     </button>
-
-    <!-- ===== SCHEDULE TAB ===== -->
-    <div class="tab-content active" id="tab-schedule">
-
-      <!-- ACTION BAR -->
-      <div class="action-bar">
-        <button id="import-btn" class="btn-ghost">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-            <polyline points="17 8 12 3 7 8" />
-            <line x1="12" y1="3" x2="12" y2="15" />
-          </svg>
-          Import
-        </button>
-        <input type="file" id="file-input" accept=".xml" style="display:none;">
-        <button id="export-btn" class="btn-ghost">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-            <polyline points="7 10 12 15 17 10" />
-            <line x1="12" y1="15" x2="12" y2="3" />
-          </svg>
-          Download
-        </button>
-      </div>
-
-      <!-- FORM -->
-      <form id="schedule-form" class="input-form">
-        <div class="input-group">
-          <label for="topic">What do you want to learn?</label>
-          <input type="text" id="topic" name="topic" placeholder="e.g., Python, Machine Learning, Guitar…" required>
-        </div>
-
-        <div class="input-group">
-          <label for="duration-value">How much time to finish?</label>
-          <div class="duration-input-container">
-            <input type="number" id="duration-value" name="duration-value" placeholder="e.g., 7" min="1" required>
-            <select id="duration-unit" name="duration-unit">
-              <option value="days" selected>Days</option>
-              <option value="weeks">Weeks</option>
-              <option value="months">Months</option>
-              <option value="years">Years</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="input-group">
-          <label for="commitment">How many hours per day?</label>
-          <input type="text" id="commitment" name="commitment" placeholder="e.g., 2 hours" required>
-        </div>
-
-        <button type="submit" class="btn-primary">Generate Schedule</button>
-      </form>
-
-      <!-- LOADING -->
-      <div id="loading">
-        <div class="loader-content">
-          <div class="loader">
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
-          <p>Generating your plan…</p>
-        </div>
-      </div>
-
-      <!-- SAVE ROUTINE BUTTON -->
-      <div class="save-routine-bar" id="save-routine-bar">
-        <button class="btn-save-routine" onclick="saveRoutine()">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-          </svg>
-          Mark as my routine
-        </button>
-      </div>
-
-      <!-- SCHEDULE GRID -->
-      <div id="schedule-container"></div>
-
-    </div><!-- /tab-schedule -->
-
-    <!-- ===== PROGRESS TAB ===== -->
-    <div class="tab-content" id="tab-progress">
-      <div class="progress-view" id="progress-view"></div>
+    <div style="text-align:center">
+      <button class="mode-toggle-mobile" id="mode-toggle-mobile" onclick="toggleAppMode()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M9 11l3 3L22 4" />
+          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+        </svg>
+        To Do
+      </button>
     </div>
 
-    <!-- FOOTER -->
-    <footer class="footer">
-      AI Learning Scheduler &middot; Powered by Gemini
-    </footer>
-  </div>
+    <!-- ===== SCHEDULER VIEW ===== -->
+    <div class="app-view" id="scheduler-view">
+      <!-- HEADER -->
+      <header class="header">
+        <h1>AI Learning <span>Scheduler</span></h1>
+        <p>Generate a personalized study plan, powered by AI</p>
+      </header>
 
-  <!-- MOBILE BOTTOM NAV -->
-  <nav class="mobile-nav" id="mobile-nav">
-    <div class="mobile-nav-inner">
-      <button class="mobile-nav-btn active" data-tab="schedule" onclick="switchTab('schedule')">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-          <line x1="16" y1="2" x2="16" y2="6" />
-          <line x1="8" y1="2" x2="8" y2="6" />
-          <line x1="3" y1="10" x2="21" y2="10" />
-        </svg>
-        Schedule
-      </button>
-      <button class="timer-fab" onclick="openTimer()">
+      <!-- NAV TABS (desktop) -->
+      <nav class="nav-tabs" id="desktop-nav">
+        <button class="nav-tab active" data-tab="schedule" onclick="switchTab('schedule')">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+            <line x1="16" y1="2" x2="16" y2="6" />
+            <line x1="8" y1="2" x2="8" y2="6" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+          </svg>
+          Schedule
+        </button>
+        <button class="nav-tab" data-tab="progress" onclick="switchTab('progress')">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+          </svg>
+          Progress
+        </button>
+      </nav>
+      <button class="desktop-timer-btn" onclick="openTimer()">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
           <circle cx="12" cy="12" r="10" />
           <polyline points="12 6 12 12 16 14" />
         </svg>
+        Pomodoro
       </button>
-      <button class="mobile-nav-btn" data-tab="progress" onclick="switchTab('progress')">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-        </svg>
-        Progress
-      </button>
-    </div>
-  </nav>
 
-  <!-- POMODORO TIMER OVERLAY -->
-  <div class="timer-overlay" id="timer-overlay">
-    <div class="timer-bg-circle"></div>
-    <button class="timer-close" onclick="closeTimer()">&times;</button>
-    <div class="timer-content">
-      <!-- SETUP STATE -->
-      <div class="timer-setup" id="timer-setup">
-        <div class="timer-title">Pomodoro Timer</div>
-        <div class="timer-picker">
-          <button class="timer-picker-btn" onclick="adjustTime(-5)">&#8722;</button>
-          <div>
-            <div class="timer-picker-display" id="timer-display">25:00</div>
-            <div class="timer-picker-label">minutes</div>
+      <!-- ===== SCHEDULE TAB ===== -->
+      <div class="tab-content active" id="tab-schedule">
+
+        <!-- ACTION BAR -->
+        <div class="action-bar">
+          <button id="import-btn" class="btn-ghost">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="17 8 12 3 7 8" />
+              <line x1="12" y1="3" x2="12" y2="15" />
+            </svg>
+            Import
+          </button>
+          <input type="file" id="file-input" accept=".xml" style="display:none;">
+          <button id="export-btn" class="btn-ghost">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            Download
+          </button>
+        </div>
+
+        <!-- FORM -->
+        <form id="schedule-form" class="input-form">
+          <div class="input-group">
+            <label for="topic">What do you want to learn?</label>
+            <input type="text" id="topic" name="topic" placeholder="e.g., Python, Machine Learning, Guitar…" required>
           </div>
-          <button class="timer-picker-btn" onclick="adjustTime(5)">+</button>
+
+          <div class="input-group">
+            <label for="duration-value">How much time to finish?</label>
+            <div class="duration-input-container">
+              <input type="number" id="duration-value" name="duration-value" placeholder="e.g., 7" min="1" required>
+              <select id="duration-unit" name="duration-unit">
+                <option value="days" selected>Days</option>
+                <option value="weeks">Weeks</option>
+                <option value="months">Months</option>
+                <option value="years">Years</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label for="commitment">How many hours per day?</label>
+            <input type="text" id="commitment" name="commitment" placeholder="e.g., 2 hours" required>
+          </div>
+
+          <button type="submit" class="btn-primary">Generate Schedule</button>
+        </form>
+
+        <!-- LOADING -->
+        <div id="loading">
+          <div class="loader-content">
+            <div class="loader">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <p>Generating your plan…</p>
+          </div>
         </div>
-        <button class="timer-start-btn" onclick="startTimer()">Start Focus</button>
+
+        <!-- SAVE ROUTINE BUTTON -->
+        <div class="save-routine-bar" id="save-routine-bar">
+          <button class="btn-save-routine" onclick="saveRoutine()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+            </svg>
+            Mark as my routine
+          </button>
+        </div>
+
+        <!-- SCHEDULE GRID -->
+        <div id="schedule-container"></div>
+
+      </div><!-- /tab-schedule -->
+
+      <!-- ===== PROGRESS TAB ===== -->
+      <div class="tab-content" id="tab-progress">
+        <div class="progress-view" id="progress-view"></div>
       </div>
-      <!-- COUNTDOWN STATE -->
-      <div class="timer-countdown" id="timer-countdown">
-        <div class="timer-ring-label">Focusing</div>
-        <div class="timer-ring-wrap">
-          <svg viewBox="0 0 240 240">
-            <circle class="timer-ring-bg" cx="120" cy="120" r="110" />
-            <circle class="timer-ring-progress" id="timer-ring" cx="120" cy="120" r="110" />
+
+      <!-- FOOTER -->
+      <footer class="footer" id="app-footer">
+        AI Learning Scheduler &middot; Powered by Gemini
+      </footer>
+    </div><!-- /scheduler-view -->
+
+    <!-- ===== TO-DO VIEW ===== -->
+    <div class="todo-wrapper" id="todo-wrapper">
+      <div class="todo-header">
+        <h2>To Do</h2>
+        <button class="todo-add-btn-desktop" onclick="openTodoInput()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
           </svg>
-          <div class="timer-ring-time" id="timer-ring-time">25:00</div>
-        </div>
-        <button class="timer-pause-btn" id="timer-pause-btn" onclick="togglePause()">
-          <svg id="pause-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <rect x="6" y="4" width="4" height="16" />
-            <rect x="14" y="4" width="4" height="16" />
-          </svg>
-          <svg id="play-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            style="display:none">
-            <polygon points="5 3 19 12 5 21 5 3" />
-          </svg>
+          Add Task
         </button>
       </div>
-      <!-- TIMEOUT STATE -->
-      <div class="timer-timeout-msg" id="timer-timeout">
-        <h2>Time's Up!</h2>
-        <p>Great focus session. Take a break.</p>
-        <button class="timer-dismiss-btn" onclick="closeTimer()">Done</button>
+      <div id="todo-list"></div>
+    </div>
+
+    <!-- MOBILE BOTTOM NAV -->
+    <nav class="mobile-nav" id="mobile-nav">
+      <div class="mobile-nav-inner">
+        <button class="mobile-nav-btn active" data-tab="schedule" onclick="switchTab('schedule')">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+            <line x1="16" y1="2" x2="16" y2="6" />
+            <line x1="8" y1="2" x2="8" y2="6" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+          </svg>
+          Schedule
+        </button>
+        <button class="timer-fab" onclick="openTimer()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+          </svg>
+        </button>
+        <button class="mobile-nav-btn" data-tab="progress" onclick="switchTab('progress')">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+          </svg>
+          Progress
+        </button>
+      </div>
+    </nav>
+
+    <!-- POMODORO TIMER OVERLAY -->
+    <div class="timer-overlay" id="timer-overlay">
+      <div class="timer-bg-circle"></div>
+      <button class="timer-close" onclick="closeTimer()">&times;</button>
+      <div class="timer-content">
+        <!-- SETUP STATE -->
+        <div class="timer-setup" id="timer-setup">
+          <div class="timer-title">Pomodoro Timer</div>
+          <div class="timer-picker">
+            <button class="timer-picker-btn" onclick="adjustTime(-5)">&#8722;</button>
+            <div>
+              <div class="timer-picker-display" id="timer-display">25:00</div>
+              <div class="timer-picker-label">minutes</div>
+            </div>
+            <button class="timer-picker-btn" onclick="adjustTime(5)">+</button>
+          </div>
+          <button class="timer-start-btn" onclick="startTimer()">Start Focus</button>
+        </div>
+        <!-- COUNTDOWN STATE -->
+        <div class="timer-countdown" id="timer-countdown">
+          <div class="timer-ring-label">Focusing</div>
+          <div class="timer-ring-wrap">
+            <svg viewBox="0 0 240 240">
+              <circle class="timer-ring-bg" cx="120" cy="120" r="110" />
+              <circle class="timer-ring-progress" id="timer-ring" cx="120" cy="120" r="110" />
+            </svg>
+            <div class="timer-ring-time" id="timer-ring-time">25:00</div>
+          </div>
+          <button class="timer-pause-btn" id="timer-pause-btn" onclick="togglePause()">
+            <svg id="pause-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor">
+              <rect x="6" y="4" width="4" height="16" />
+              <rect x="14" y="4" width="4" height="16" />
+            </svg>
+            <svg id="play-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              style="display:none">
+              <polygon points="5 3 19 12 5 21 5 3" />
+            </svg>
+          </button>
+        </div>
+        <!-- TIMEOUT STATE -->
+        <div class="timer-timeout-msg" id="timer-timeout">
+          <h2>Time's Up!</h2>
+          <p>Great focus session. Take a break.</p>
+          <button class="timer-dismiss-btn" onclick="closeTimer()">Done</button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- TOAST -->
-  <div class="toast" id="toast"></div>
+    <!-- TOAST -->
+    <div class="toast" id="toast"></div>
+
+    <!-- TO-DO FAB (mobile) -->
+    <button class="todo-fab" id="todo-fab" onclick="openTodoInput()">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <line x1="12" y1="5" x2="12" y2="19" />
+        <line x1="5" y1="12" x2="19" y2="12" />
+      </svg>
+    </button>
+
+    <!-- TO-DO INPUT OVERLAY -->
+    <div class="todo-input-overlay" id="todo-input-overlay">
+      <div class="todo-input-row">
+        <input type="text" class="todo-input-field" id="todo-input-field" placeholder="What needs to be done?"
+          maxlength="200">
+        <button class="todo-input-ok" onclick="addTodoFromInput()">OK</button>
+      </div>
+    </div>
+
+  </div><!-- /container -->
 
   <!-- LIGHTBOX MODAL -->
   <div id="lightbox-overlay">
@@ -2559,6 +2977,188 @@
       overlay.classList.add('timeout');
       document.getElementById('timer-countdown').classList.remove('active');
       document.getElementById('timer-timeout').classList.add('active');
+    }
+
+    // --- 12. To-Do Feature ---
+
+    let todoMode = localStorage.getItem('ai_scheduler_mode') === 'todo';
+
+    function getTodos() {
+      try { return JSON.parse(localStorage.getItem('ai_scheduler_todos')) || []; }
+      catch { return []; }
+    }
+
+    function setTodos(todos) {
+      localStorage.setItem('ai_scheduler_todos', JSON.stringify(todos));
+    }
+
+    function toggleAppMode() {
+      todoMode = !todoMode;
+      localStorage.setItem('ai_scheduler_mode', todoMode ? 'todo' : 'scheduler');
+      applyAppMode(true);
+    }
+
+    function applyAppMode(animate) {
+      const schedulerView = document.getElementById('scheduler-view');
+      const todoWrapper = document.getElementById('todo-wrapper');
+      const mobileNav = document.getElementById('mobile-nav');
+      const todoFab = document.getElementById('todo-fab');
+      const desktopTimerBtn = document.querySelector('.desktop-timer-btn');
+      const footer = document.getElementById('app-footer');
+      const toggleDesktop = document.getElementById('mode-toggle-desktop');
+      const toggleMobile = document.getElementById('mode-toggle-mobile');
+
+      // SVG icons
+      const checkIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>';
+      const calendarIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
+
+      if (todoMode) {
+        toggleDesktop.innerHTML = calendarIcon + ' AI Scheduler';
+        toggleMobile.innerHTML = calendarIcon + ' AI Scheduler';
+        if (animate) {
+          schedulerView.classList.add('vanish');
+          setTimeout(() => {
+            schedulerView.style.display = 'none';
+            todoWrapper.classList.add('active');
+            mobileNav.style.display = 'none';
+            if (todoFab) todoFab.classList.add('visible');
+            if (desktopTimerBtn) desktopTimerBtn.style.display = 'none';
+            if (footer) footer.style.display = 'none';
+            renderTodoList();
+          }, 350);
+        } else {
+          schedulerView.style.display = 'none';
+          schedulerView.classList.add('vanish');
+          todoWrapper.classList.add('active');
+          mobileNav.style.display = 'none';
+          if (todoFab) todoFab.classList.add('visible');
+          if (desktopTimerBtn) desktopTimerBtn.style.display = 'none';
+          if (footer) footer.style.display = 'none';
+          renderTodoList();
+        }
+      } else {
+        toggleDesktop.innerHTML = checkIcon + ' To Do';
+        toggleMobile.innerHTML = checkIcon + ' To Do';
+        todoWrapper.classList.remove('active');
+        if (todoFab) todoFab.classList.remove('visible');
+        closeTodoInput();
+        if (animate) {
+          setTimeout(() => {
+            schedulerView.style.display = '';
+            schedulerView.classList.remove('vanish');
+            mobileNav.style.display = '';
+            if (desktopTimerBtn) desktopTimerBtn.style.display = '';
+            if (footer) footer.style.display = '';
+          }, 50);
+        } else {
+          schedulerView.style.display = '';
+          schedulerView.classList.remove('vanish');
+          mobileNav.style.display = '';
+          if (desktopTimerBtn) desktopTimerBtn.style.display = '';
+          if (footer) footer.style.display = '';
+        }
+      }
+    }
+
+    function renderTodoList() {
+      const list = document.getElementById('todo-list');
+      const todos = getTodos();
+
+      if (todos.length === 0) {
+        list.innerHTML = '<div class="todo-empty">No tasks yet. Tap + to add one.</div>';
+        return;
+      }
+
+      const unchecked = todos.filter(t => !t.done);
+      const checked = todos.filter(t => t.done);
+
+      let html = '';
+      unchecked.forEach((t, i) => {
+        const idx = todos.indexOf(t);
+        html += buildTodoItem(t, idx, i);
+      });
+
+      if (checked.length > 0) {
+        html += '<div class="todo-checked-label">Completed</div>';
+        checked.forEach((t, i) => {
+          const idx = todos.indexOf(t);
+          html += buildTodoItem(t, idx, unchecked.length + i);
+        });
+      }
+
+      list.innerHTML = html;
+    }
+
+    function buildTodoItem(t, idx, animIdx) {
+      const checkedClass = t.done ? 'checked-item' : '';
+      const checkClass = t.done ? 'checked' : '';
+      return '<div class="todo-item ' + checkedClass + '" style="animation-delay:' + (animIdx * 0.04) + 's">' +
+        '<button class="todo-check ' + checkClass + '" onclick="toggleTodo(' + idx + ')">' +
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>' +
+        '</button>' +
+        '<span class="todo-text">' + t.text + '</span>' +
+        '<button class="todo-delete" onclick="deleteTodo(' + idx + ')">' +
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+        '</button>' +
+        '</div>';
+    }
+
+    function toggleTodo(idx) {
+      const todos = getTodos();
+      if (!todos[idx]) return;
+      todos[idx].done = !todos[idx].done;
+      setTodos(todos);
+
+      if (todos[idx].done) {
+        // Show checked state immediately, then move to Completed after 5s
+        renderTodoList();
+        setTimeout(() => renderTodoList(), 5000);
+      } else {
+        renderTodoList();
+      }
+    }
+
+    function deleteTodo(idx) {
+      const todos = getTodos();
+      todos.splice(idx, 1);
+      setTodos(todos);
+      renderTodoList();
+    }
+
+    function openTodoInput() {
+      const overlay = document.getElementById('todo-input-overlay');
+      const field = document.getElementById('todo-input-field');
+      overlay.classList.add('open');
+      setTimeout(() => field.focus(), 300);
+    }
+
+    function closeTodoInput() {
+      const overlay = document.getElementById('todo-input-overlay');
+      overlay.classList.remove('open');
+      document.getElementById('todo-input-field').value = '';
+    }
+
+    function addTodoFromInput() {
+      const field = document.getElementById('todo-input-field');
+      const text = field.value.trim();
+      if (!text) return;
+
+      const todos = getTodos();
+      todos.push({ text: text, done: false, id: Date.now() });
+      setTodos(todos);
+      field.value = '';
+      closeTodoInput();
+      renderTodoList();
+    }
+
+    // Enter key to submit
+    document.getElementById('todo-input-field').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') addTodoFromInput();
+    });
+
+    // Initialize mode on load
+    if (todoMode) {
+      applyAppMode(false);
     }
 
   </script>
