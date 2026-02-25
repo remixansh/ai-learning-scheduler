@@ -1215,6 +1215,7 @@
       align-items: center;
       justify-content: space-between;
       margin-bottom: 24px;
+      padding-top: 20px;
     }
 
     .todo-header h2 {
@@ -1390,7 +1391,7 @@
     .todo-fab {
       display: none;
       position: fixed;
-      bottom: 32px;
+      bottom: 30px;
       right: 24px;
       width: 52px;
       height: 52px;
@@ -1422,7 +1423,7 @@
 
     @media (max-width: 640px) {
       .todo-fab {
-        bottom: 80px;
+        bottom: 30px;
         right: 20px;
       }
     }
@@ -2252,6 +2253,18 @@
 
     <!-- ===== TO-DO VIEW ===== -->
     <div class="todo-wrapper" id="todo-wrapper">
+      <!-- Mobile toggle back to Scheduler -->
+      <div style="text-align:center; padding-top:8px">
+        <button class="mode-toggle-mobile" id="mode-toggle-mobile-todo" onclick="toggleAppMode()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+            <line x1="16" y1="2" x2="16" y2="6" />
+            <line x1="8" y1="2" x2="8" y2="6" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+          </svg>
+          AI Scheduler
+        </button>
+      </div>
       <div class="todo-header">
         <h2>To Do</h2>
         <button class="todo-add-btn-desktop" onclick="openTodoInput()">
