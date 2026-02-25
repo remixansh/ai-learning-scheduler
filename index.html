@@ -1120,6 +1120,418 @@
     }
 
     /* ========================================
+       POMODORO TIMER — FAB BUTTON
+       ======================================== */
+    .timer-fab {
+      position: relative;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: 4px solid var(--surface);
+      box-shadow: 0 4px 16px rgba(232, 104, 74, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      margin-top: -28px;
+      z-index: 10;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .timer-fab:hover {
+      transform: scale(1.08);
+      box-shadow: 0 6px 20px rgba(232, 104, 74, 0.45);
+    }
+
+    .timer-fab:active {
+      transform: scale(0.95);
+    }
+
+    .timer-fab svg {
+      width: 24px;
+      height: 24px;
+      color: #FFFFFF;
+      stroke-width: 2;
+    }
+
+    /* Desktop timer button */
+    .desktop-timer-btn {
+      position: fixed;
+      top: 20px;
+      right: 24px;
+      z-index: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 18px;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: inherit;
+      color: #FFFFFF;
+      background: var(--accent);
+      border: none;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+
+    .desktop-timer-btn:hover {
+      background: var(--accent-hover);
+      box-shadow: 0 4px 14px rgba(232, 104, 74, 0.3);
+    }
+
+    .desktop-timer-btn svg {
+      width: 16px;
+      height: 16px;
+      stroke-width: 2;
+    }
+
+    @media (max-width: 640px) {
+      .desktop-timer-btn {
+        display: none;
+      }
+    }
+
+    /* ========================================
+       POMODORO TIMER — FULLSCREEN OVERLAY
+       ======================================== */
+    .timer-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2500;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .timer-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Expanding circle background */
+    .timer-bg-circle {
+      position: absolute;
+      border-radius: 50%;
+      background: var(--accent);
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      transform: scale(0);
+      width: 200vmax;
+      height: 200vmax;
+      top: 50%;
+      left: 50%;
+      margin-top: -100vmax;
+      margin-left: -100vmax;
+    }
+
+    .timer-overlay.active .timer-bg-circle {
+      transform: scale(1);
+    }
+
+    /* Timer content */
+    .timer-content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+      color: #FFFFFF;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.4s ease 0.3s;
+    }
+
+    .timer-overlay.active .timer-content {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .timer-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 2;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.15);
+      border: none;
+      color: #FFFFFF;
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s;
+      opacity: 0;
+      transition: all 0.3s ease 0.5s;
+    }
+
+    .timer-overlay.active .timer-close {
+      opacity: 1;
+    }
+
+    .timer-close:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .timer-title {
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      opacity: 0.8;
+    }
+
+    /* ========================================
+       POMODORO — TIME PICKER
+       ======================================== */
+    .timer-picker {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .timer-picker-btn {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.1);
+      color: #FFFFFF;
+      font-size: 1.5rem;
+      font-weight: 300;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .timer-picker-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .timer-picker-btn:active {
+      transform: scale(0.9);
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .timer-picker-display {
+      font-size: 4rem;
+      font-weight: 200;
+      letter-spacing: -0.02em;
+      min-width: 140px;
+      text-align: center;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .timer-picker-label {
+      font-size: 13px;
+      opacity: 0.6;
+      text-align: center;
+      margin-top: -8px;
+    }
+
+    .timer-start-btn {
+      padding: 14px 48px;
+      border-radius: 100px;
+      background: #FFFFFF;
+      color: var(--accent);
+      font-size: 16px;
+      font-weight: 700;
+      font-family: inherit;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      letter-spacing: 0.04em;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .timer-start-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .timer-start-btn:active {
+      transform: scale(0.97);
+    }
+
+    /* ========================================
+       POMODORO — COUNTDOWN STATE
+       ======================================== */
+    .timer-countdown {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .timer-countdown.active {
+      display: flex;
+    }
+
+    .timer-ring-wrap {
+      position: relative;
+      width: 240px;
+      height: 240px;
+    }
+
+    .timer-ring-wrap svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .timer-ring-bg {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.15);
+      stroke-width: 4;
+    }
+
+    .timer-ring-progress {
+      fill: none;
+      stroke: #FFFFFF;
+      stroke-width: 4;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 1s linear;
+    }
+
+    .timer-ring-time {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 3.5rem;
+      font-weight: 200;
+      color: #FFFFFF;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.01em;
+    }
+
+    .timer-ring-label {
+      font-size: 13px;
+      opacity: 0.7;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .timer-pause-btn {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      background: rgba(255, 255, 255, 0.1);
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .timer-pause-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .timer-pause-btn:active {
+      transform: scale(0.9);
+    }
+
+    .timer-pause-btn svg {
+      width: 24px;
+      height: 24px;
+      stroke-width: 2;
+    }
+
+    /* ========================================
+       POMODORO — TIMEOUT STATE
+       ======================================== */
+    .timer-overlay.timeout .timer-bg-circle {
+      background: radial-gradient(circle at center, #FF3B30 0%, #CC2D25 40%, #991F1A 80%, #661510 100%);
+    }
+
+    .timer-timeout-msg {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      animation: timeoutPulse 2s ease infinite;
+    }
+
+    .timer-timeout-msg.active {
+      display: flex;
+    }
+
+    .timer-timeout-msg h2 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #FFFFFF;
+      letter-spacing: -0.02em;
+    }
+
+    .timer-timeout-msg p {
+      font-size: 15px;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .timer-dismiss-btn {
+      margin-top: 12px;
+      padding: 12px 36px;
+      border-radius: 100px;
+      background: rgba(255, 255, 255, 0.2);
+      color: #FFFFFF;
+      border: 1.5px solid rgba(255, 255, 255, 0.4);
+      font-size: 15px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .timer-dismiss-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    @keyframes timeoutPulse {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.85;
+      }
+    }
+
+    /* Hide picker/countdown when toggling states */
+    .timer-setup {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+    }
+
+    .timer-setup.hidden {
+      display: none;
+    }
+
+    /* ========================================
        MOBILE BOTTOM NAV
        ======================================== */
     .mobile-nav {
@@ -1250,6 +1662,13 @@
         Progress
       </button>
     </nav>
+    <button class="desktop-timer-btn" onclick="openTimer()">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <circle cx="12" cy="12" r="10" />
+        <polyline points="12 6 12 12 16 14" />
+      </svg>
+      Pomodoro
+    </button>
 
     <!-- ===== SCHEDULE TAB ===== -->
     <div class="tab-content active" id="tab-schedule">
@@ -1353,6 +1772,12 @@
         </svg>
         Schedule
       </button>
+      <button class="timer-fab" onclick="openTimer()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <circle cx="12" cy="12" r="10" />
+          <polyline points="12 6 12 12 16 14" />
+        </svg>
+      </button>
       <button class="mobile-nav-btn" data-tab="progress" onclick="switchTab('progress')">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
           <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
@@ -1361,6 +1786,54 @@
       </button>
     </div>
   </nav>
+
+  <!-- POMODORO TIMER OVERLAY -->
+  <div class="timer-overlay" id="timer-overlay">
+    <div class="timer-bg-circle"></div>
+    <button class="timer-close" onclick="closeTimer()">&times;</button>
+    <div class="timer-content">
+      <!-- SETUP STATE -->
+      <div class="timer-setup" id="timer-setup">
+        <div class="timer-title">Pomodoro Timer</div>
+        <div class="timer-picker">
+          <button class="timer-picker-btn" onclick="adjustTime(-5)">&#8722;</button>
+          <div>
+            <div class="timer-picker-display" id="timer-display">25:00</div>
+            <div class="timer-picker-label">minutes</div>
+          </div>
+          <button class="timer-picker-btn" onclick="adjustTime(5)">+</button>
+        </div>
+        <button class="timer-start-btn" onclick="startTimer()">Start Focus</button>
+      </div>
+      <!-- COUNTDOWN STATE -->
+      <div class="timer-countdown" id="timer-countdown">
+        <div class="timer-ring-label">Focusing</div>
+        <div class="timer-ring-wrap">
+          <svg viewBox="0 0 240 240">
+            <circle class="timer-ring-bg" cx="120" cy="120" r="110" />
+            <circle class="timer-ring-progress" id="timer-ring" cx="120" cy="120" r="110" />
+          </svg>
+          <div class="timer-ring-time" id="timer-ring-time">25:00</div>
+        </div>
+        <button class="timer-pause-btn" id="timer-pause-btn" onclick="togglePause()">
+          <svg id="pause-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <rect x="6" y="4" width="4" height="16" />
+            <rect x="14" y="4" width="4" height="16" />
+          </svg>
+          <svg id="play-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            style="display:none">
+            <polygon points="5 3 19 12 5 21 5 3" />
+          </svg>
+        </button>
+      </div>
+      <!-- TIMEOUT STATE -->
+      <div class="timer-timeout-msg" id="timer-timeout">
+        <h2>Time's Up!</h2>
+        <p>Great focus session. Take a break.</p>
+        <button class="timer-dismiss-btn" onclick="closeTimer()">Done</button>
+      </div>
+    </div>
+  </div>
 
   <!-- TOAST -->
   <div class="toast" id="toast"></div>
@@ -1878,6 +2351,118 @@
 
     // Initialize progress tab
     renderRoutines();
+
+    // --- 11. Pomodoro Timer ---
+
+    let pomodoroMinutes = 25;
+    let pomodoroSeconds = 0;
+    let pomodoroInterval = null;
+    let pomodoroTotalSeconds = 25 * 60;
+    let pomodoroPaused = false;
+    const RING_CIRCUMFERENCE = 2 * Math.PI * 110;
+
+    function formatTime(min, sec) {
+      return String(min).padStart(2, '0') + ':' + String(sec).padStart(2, '0');
+    }
+
+    function openTimer() {
+      const overlay = document.getElementById('timer-overlay');
+      overlay.classList.remove('timeout');
+      resetTimerUI();
+      overlay.classList.add('active');
+      document.body.classList.add('no-scroll');
+    }
+
+    function closeTimer() {
+      const overlay = document.getElementById('timer-overlay');
+      if (pomodoroInterval) {
+        clearInterval(pomodoroInterval);
+        pomodoroInterval = null;
+      }
+      overlay.classList.remove('active', 'timeout');
+      document.body.classList.remove('no-scroll');
+      pomodoroPaused = false;
+      pomodoroMinutes = 25;
+      pomodoroSeconds = 0;
+    }
+
+    function resetTimerUI() {
+      document.getElementById('timer-setup').classList.remove('hidden');
+      document.getElementById('timer-countdown').classList.remove('active');
+      document.getElementById('timer-timeout').classList.remove('active');
+      document.getElementById('timer-display').textContent = formatTime(pomodoroMinutes, 0);
+      document.getElementById('pause-icon').style.display = '';
+      document.getElementById('play-icon').style.display = 'none';
+      pomodoroPaused = false;
+      if (pomodoroInterval) {
+        clearInterval(pomodoroInterval);
+        pomodoroInterval = null;
+      }
+    }
+
+    function adjustTime(delta) {
+      pomodoroMinutes = Math.max(5, Math.min(120, pomodoroMinutes + delta));
+      const display = document.getElementById('timer-display');
+      display.textContent = formatTime(pomodoroMinutes, 0);
+      // Tactile scale pop
+      display.style.transform = 'scale(1.08)';
+      setTimeout(() => { display.style.transform = 'scale(1)'; }, 120);
+    }
+
+    function startTimer() {
+      pomodoroTotalSeconds = pomodoroMinutes * 60;
+      pomodoroSeconds = pomodoroTotalSeconds;
+      pomodoroPaused = false;
+
+      // Switch to countdown view
+      document.getElementById('timer-setup').classList.add('hidden');
+      document.getElementById('timer-countdown').classList.add('active');
+
+      // Init ring
+      const ring = document.getElementById('timer-ring');
+      ring.style.strokeDasharray = RING_CIRCUMFERENCE;
+      ring.style.strokeDashoffset = '0';
+
+      updateTimerDisplay();
+
+      pomodoroInterval = setInterval(() => {
+        if (pomodoroPaused) return;
+        pomodoroSeconds--;
+
+        if (pomodoroSeconds <= 0) {
+          clearInterval(pomodoroInterval);
+          pomodoroInterval = null;
+          onTimeout();
+          return;
+        }
+
+        updateTimerDisplay();
+
+        // Update ring
+        const progress = 1 - (pomodoroSeconds / pomodoroTotalSeconds);
+        const offset = progress * RING_CIRCUMFERENCE;
+        ring.style.strokeDashoffset = -offset;
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      const min = Math.floor(pomodoroSeconds / 60);
+      const sec = pomodoroSeconds % 60;
+      document.getElementById('timer-ring-time').textContent = formatTime(min, sec);
+    }
+
+    function togglePause() {
+      pomodoroPaused = !pomodoroPaused;
+      document.getElementById('pause-icon').style.display = pomodoroPaused ? 'none' : '';
+      document.getElementById('play-icon').style.display = pomodoroPaused ? '' : 'none';
+    }
+
+    function onTimeout() {
+      const overlay = document.getElementById('timer-overlay');
+      overlay.classList.add('timeout');
+      document.getElementById('timer-countdown').classList.remove('active');
+      document.getElementById('timer-timeout').classList.add('active');
+    }
 
   </script>
 </body>
