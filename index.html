@@ -1386,12 +1386,12 @@
       font-size: 14px;
     }
 
-    /* Mobile FAB for adding tasks */
+    /* FAB for adding tasks (bottom right) */
     .todo-fab {
       display: none;
       position: fixed;
-      bottom: 80px;
-      right: 20px;
+      bottom: 32px;
+      right: 24px;
       width: 52px;
       height: 52px;
       border-radius: 50%;
@@ -1406,6 +1406,10 @@
       transition: transform 0.2s ease;
     }
 
+    .todo-fab.visible {
+      display: flex;
+    }
+
     .todo-fab:active {
       transform: scale(0.9);
     }
@@ -1417,8 +1421,9 @@
     }
 
     @media (max-width: 640px) {
-      .todo-fab.visible {
-        display: flex;
+      .todo-fab {
+        bottom: 80px;
+        right: 20px;
       }
     }
 
@@ -1440,6 +1445,20 @@
 
     .todo-input-overlay.open {
       transform: translateY(0);
+    }
+
+    .todo-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 999;
+      display: none;
+    }
+
+    .todo-backdrop.open {
+      display: block;
     }
 
     .todo-input-row {
@@ -2333,6 +2352,9 @@
       </svg>
     </button>
 
+    <!-- TO-DO INPUT BACKDROP -->
+    <div class="todo-backdrop" id="todo-backdrop" onclick="closeTodoInput()"></div>
+
     <!-- TO-DO INPUT OVERLAY -->
     <div class="todo-input-overlay" id="todo-input-overlay">
       <div class="todo-input-row">
@@ -3154,6 +3176,7 @@
     }
 
     function openTodoInput() {
+      document.getElementById('todo-backdrop').classList.add('open');
       const overlay = document.getElementById('todo-input-overlay');
       const field = document.getElementById('todo-input-field');
       overlay.classList.add('open');
@@ -3161,6 +3184,7 @@
     }
 
     function closeTodoInput() {
+      document.getElementById('todo-backdrop').classList.remove('open');
       const overlay = document.getElementById('todo-input-overlay');
       overlay.classList.remove('open');
       document.getElementById('todo-input-field').value = '';
