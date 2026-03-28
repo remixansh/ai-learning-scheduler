@@ -25,7 +25,7 @@ class _ModelFactory:
         return _ModelWithChunks(self._chunks)
 
 
-class StreamingJsonValidationTests(unittest.IsolatedAsyncioTestCase):
+class StreamJsonObjectsTests(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
         self.original_model = main.genai.GenerativeModel
 

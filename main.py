@@ -164,11 +164,21 @@ async def stream_json_objects(request: ScheduleRequest) -> AsyncGenerator[str, N
                 while '\n' in buffer:
                     line, buffer = buffer.split('\n', 1)
                     if line.strip():
-                        json.loads(line)
+                        try:
+                            json.loads(line)
+                        except json.JSONDecodeError as decode_err:
+                            raise ValueError(
+                                "Invalid JSON object received from model stream."
+                            ) from decode_err
                         yield line + '\n'
         
         if buffer.strip():
-            json.loads(buffer)
+            try:
+                json.loads(buffer)
+            except json.JSONDecodeError as decode_err:
+                raise ValueError(
+                    "Invalid trailing JSON object received from model stream."
+                ) from decode_err
             yield buffer + '\n'
             
     except Exception as e:
