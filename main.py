@@ -164,9 +164,11 @@ async def stream_json_objects(request: ScheduleRequest) -> AsyncGenerator[str, N
                 while '\n' in buffer:
                     line, buffer = buffer.split('\n', 1)
                     if line.strip():
+                        json.loads(line)
                         yield line + '\n'
         
         if buffer.strip():
+            json.loads(buffer)
             yield buffer + '\n'
             
     except Exception as e:
